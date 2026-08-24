@@ -1,0 +1,2994 @@
+<!doctype html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Paint Force — Mobile paint &amp; scratch repair</title>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
+
+<!-- Token stylesheet loads first so Tailwind's utilities win on equal specificity -->
+<style>
+500;600&family=JetBrains+Mono:wght@400;500;700&family=Montserrat:wght@600;700;800;900&display=swap');
+
+
+
+
+
+/* ==========================================================================
+   Precision & Velocity — token layer
+   Values are lifted verbatim from DESIGN.md. Tailwind reads these through
+   tailwind.config.js, and the semantic classes below let the same markup work
+   without a build step.
+   ========================================================================== */
+
+
+:root {
+  --background: #101417;
+  --surface: #101417;
+  --surface-dim: #101417;
+  --surface-bright: #36393e;
+  --surface-container-lowest: #0b0f12;
+  --surface-container-low: #181c20;
+  --surface-container: #1c2024;
+  --surface-container-high: #272a2e;
+  --surface-container-highest: #323539;
+  --surface-variant: #323539;
+
+  --on-surface: #e0e2e8;
+  --on-surface-variant: #e7bdb2;
+
+  --primary: #ffb5a0;
+  --on-primary: #601400;
+  --primary-container: #ff5625;
+  --on-primary-container: #541100;
+  --primary-fixed: #ffdbd1;
+  --inverse-primary: #b12d00;
+
+  --secondary: #c1c7cf;
+  --tertiary: #c8c6c5;
+
+  --outline: #ad887e;
+  --outline-variant: #5d4038;
+
+  --error: #ffb4ab;
+  --error-container: #93000a;
+  --on-error-container: #ffdad6;
+
+  --font-display: 'Montserrat', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  --radius: 4px;
+  --gutter: 24px;
+  --container: 1280px;
+}
+
+* { border-color: color-mix(in srgb, var(--outline-variant) 20%, transparent); }
+
+html { scroll-behavior: smooth; scroll-padding-top: 88px; }
+
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--on-surface);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+
+
+  /* --- Type roles ---------------------------------------------------------- */
+
+  .t-display {
+    font-family: var(--font-display);
+    font-size: 64px;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+  .t-h1 { font-family: var(--font-display); font-size: 40px; font-weight: 700; line-height: 1.2; }
+  .t-h2 { font-family: var(--font-display); font-size: 24px; font-weight: 600; line-height: 1.3; }
+  .t-h3 { font-family: var(--font-display); font-size: 18px; font-weight: 600; line-height: 1.35; }
+  .t-body-lg { font-size: 18px; line-height: 1.6; }
+  .t-body { font-size: 16px; line-height: 1.6; }
+  .t-caps {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .t-mono { font-family: var(--font-mono); }
+
+  @media (max-width: 767px) {
+    .t-display { font-size: 34px; letter-spacing: -0.01em; }
+    .t-h1 { font-size: 28px; }
+    .t-h2 { font-size: 21px; }
+  }
+
+  /* --- Tonal surfaces (depth via layers, not shadows) ---------------------- */
+
+  .s-lowest { background: var(--surface-container-lowest); }
+  .s-low { background: var(--surface-container-low); }
+  .s-base { background: var(--surface); }
+  .s-container { background: var(--surface-container); }
+  .s-high { background: var(--surface-container-high); }
+  .s-highest { background: var(--surface-container-highest); }
+
+  .c-on { color: var(--on-surface); }
+  .c-variant { color: var(--on-surface-variant); }
+  .c-primary { color: var(--primary); }
+  .c-outline { color: var(--outline); }
+
+  .hairline { border: 1px solid color-mix(in srgb, var(--outline-variant) 22%, transparent); }
+  .hairline-t { border-top: 1px solid color-mix(in srgb, var(--outline-variant) 22%, transparent); }
+  .hairline-b { border-bottom: 1px solid color-mix(in srgb, var(--outline-variant) 22%, transparent); }
+
+  /* --- Buttons ------------------------------------------------------------- */
+
+  .btn {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-radius: var(--radius);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: background-color .18s ease, color .18s ease, border-color .18s ease,
+                transform .12s ease, box-shadow .18s ease, opacity .18s ease;
+    white-space: nowrap;
+  }
+  .btn:active { transform: scale(.97); }
+  .btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+
+  .btn-primary {
+    background: var(--primary-container);
+    color: #fff;
+    box-shadow: 0 2px 10px -2px color-mix(in srgb, var(--primary-container) 45%, transparent);
+  }
+  .btn-primary:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--primary-container) 88%, #fff);
+    box-shadow: 0 4px 18px -4px color-mix(in srgb, var(--primary-container) 60%, transparent);
+  }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--on-surface);
+    border-color: color-mix(in srgb, var(--outline) 45%, transparent);
+  }
+  .btn-ghost:hover:not(:disabled) {
+    background: var(--surface-container);
+    border-color: var(--outline);
+  }
+
+  .btn-quiet { background: transparent; color: var(--primary); }
+  .btn-quiet:hover:not(:disabled) { color: var(--primary-fixed); }
+
+  /* --- Form controls ------------------------------------------------------- */
+
+  .field {
+    width: 100%;
+    background: var(--surface);
+    color: var(--on-surface);
+    border: 1px solid color-mix(in srgb, var(--outline-variant) 35%, transparent);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    font-family: var(--font-body);
+    font-size: 15px;
+    outline: none;
+    transition: border-color .18s ease, box-shadow .18s ease;
+  }
+  .field::placeholder { color: color-mix(in srgb, var(--on-surface-variant) 45%, transparent); }
+  .field:focus {
+    border-color: var(--primary-container);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-container) 22%, transparent);
+  }
+  .field[aria-invalid='true'] {
+    border-color: var(--error);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--error) 18%, transparent);
+  }
+
+  select.field {
+    appearance: none;
+    background-image: linear-gradient(45deg, transparent 50%, var(--on-surface-variant) 50%),
+                      linear-gradient(135deg, var(--on-surface-variant) 50%, transparent 50%);
+    background-position: calc(100% - 18px) center, calc(100% - 13px) center;
+    background-size: 5px 5px, 5px 5px;
+    background-repeat: no-repeat;
+    padding-right: 36px;
+  }
+
+  /* --- Cards --------------------------------------------------------------- */
+
+  .card {
+    background: var(--surface);
+    border: 1px solid color-mix(in srgb, var(--outline-variant) 22%, transparent);
+    border-radius: var(--radius);
+    transition: border-color .25s ease, box-shadow .25s ease, transform .25s ease;
+  }
+  .card-interactive:hover {
+    border-color: color-mix(in srgb, var(--primary) 45%, transparent);
+    box-shadow: 0 1px 0 0 color-mix(in srgb, var(--primary) 8%, transparent),
+                0 8px 24px -18px #000;
+  }
+
+  .chip {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: var(--surface-container);
+    border: 1px solid color-mix(in srgb, var(--outline-variant) 25%, transparent);
+    border-radius: 2px;
+    padding: 5px 8px;
+    color: var(--on-surface-variant);
+    white-space: nowrap;
+  }
+
+  /* --- Focus + motion ------------------------------------------------------ */
+
+  :where(a, button, input, select, textarea, [tabindex]):focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  .reveal { opacity: 0; transform: translateY(18px); }
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+    transition: opacity .6s cubic-bezier(.2,.7,.3,1), transform .6s cubic-bezier(.2,.7,.3,1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      animation-duration: .01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .01ms !important;
+    }
+    .reveal { opacity: 1; transform: none; }
+  }
+
+  /* --- Utilities ----------------------------------------------------------- */
+
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  .grain::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: .5;
+    background-image: radial-gradient(circle at 1px 1px,
+      color-mix(in srgb, var(--outline) 12%, transparent) 1px, transparent 0);
+    background-size: 4px 4px;
+  }
+
+
+</style>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        background: 'var(--background)', surface: 'var(--surface)',
+        'surface-lowest': 'var(--surface-container-lowest)',
+        'surface-low': 'var(--surface-container-low)',
+        'surface-container': 'var(--surface-container)',
+        'surface-high': 'var(--surface-container-high)',
+        'surface-highest': 'var(--surface-container-highest)',
+        'on-surface': 'var(--on-surface)', 'on-surface-variant': 'var(--on-surface-variant)',
+        primary: 'var(--primary)', 'primary-container': 'var(--primary-container)',
+        secondary: 'var(--secondary)', outline: 'var(--outline)',
+        'outline-variant': 'var(--outline-variant)', error: 'var(--error)',
+      },
+      fontFamily: {
+        display: ['Montserrat', 'sans-serif'],
+        body: ['Inter', 'sans-serif'],
+        mono: ['JetBrains Mono', 'monospace'],
+      },
+      borderRadius: { DEFAULT: '4px', sm: '2px', md: '6px', lg: '8px', xl: '12px' },
+      spacing: { gutter: '24px', section: '80px' },
+      maxWidth: { container: '1280px' },
+    },
+  },
+}</script>
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.26.4/babel.min.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" data-type="module">
+const { useState, useEffect, useRef, useMemo, useCallback, createContext, useContext } = React
+
+/* ===== src/lib/data.js ===== */
+/**
+ * Site content.
+ *
+ * Image URLs came out of the original design export and are hosted on Google's
+ * CDN, which expires them. Every <img> in this app degrades to a tonal
+ * placeholder if the fetch fails, so a dead link never leaves a white box —
+ * but swap these for your own photography before launch.
+ */
+
+const HERO_IMAGE =
+  'https://lh3.googleusercontent.com/aida-public/AB6AXuAQ3ndOaeU9PS4l-7uTTilPy3mIBektPOxZQ_wGrl0l14xsdNKsZKyoV_Uli9o_Ww4eDJBRKy0Zm2yQ5uFSyKCrgUcuoCzDYc0FTmFg33OZz5DryEW5fTLx800R6MwqqnOWzoQc2JNwfgfPwFrRcK43fYLBYLRxOViWbTawlH7JfUSgkY0TjoVgL8bd-8lj1uhamsfTtarvGfxeLaaXAvxtlKquGBBR2hizHR7BFjTIPvO3gKVF7GOqKA'
+
+const LOGO =
+  'https://lh3.googleusercontent.com/aida-public/AB6AXuDgcDgyu-_aC3bfPseZnpbFN2USggF0qqyHV6127qFuy7KrmH8QTpj6qMLD1jD6C5LC8Y4sCgOV8ANfoGmFsjtlMmTI0rcTJ2kBT7bEumyFN4M86UDsrdi1VlobOBkAiuDTsgccus7YPLwpRSF4tQ9cpp-OcUx5nNm5JP_3TENUq26Atz1MrULztyUnh4nuZ4BW5VdPsLv2CK5IF9oRA-OYjs02WKNj115mhOZEmi7H11-SATaBeWCUbw'
+
+const SERVICES = [
+  {
+    id: 'scratch',
+    icon: 'wand',
+    name: 'Scratch removal',
+    est: '1–2 HRS',
+    price: 'from $189',
+    blurb:
+      'Clear-coat correction with graded micro-abrasives. Removes the scratch instead of filling it, so the panel keeps its factory depth.',
+    detail: [
+      'Depth-tested with a paint gauge before any cutting',
+      'Machine polish through 3 abrasive grades',
+      'Sealed with a ceramic-infused protectant',
+    ],
+  },
+  {
+    id: 'touchup',
+    icon: 'paint',
+    name: 'Paint touch-up',
+    est: '2–3 HRS',
+    price: 'from $240',
+    blurb:
+      'Rock chips and scuffs filled with paint mixed to your VIN code, then levelled flush so the repair disappears at arm’s length.',
+    detail: [
+      'Colour matched to your VIN, not a chart',
+      'Spectrophotometer check under three light temperatures',
+      'Blended into adjacent panels to hide the edge',
+    ],
+  },
+  {
+    id: 'bumper',
+    icon: 'car',
+    name: 'Bumper repair',
+    est: '3–4 HRS',
+    price: 'from $420',
+    blurb:
+      'Plastic welding and localised refinishing for cracks, scuffs and parking-lot damage. No dealership queue, no replacement part.',
+    detail: [
+      'Nitrogen plastic welding on cracks and tabs',
+      'Contour rebuilt with flexible filler',
+      'Refinished and clear-coated on site',
+    ],
+  },
+]
+
+const PROCESS = [
+  {
+    n: '01',
+    title: 'Send photos',
+    body: 'Upload shots of the damage. A technician reads them and returns a fixed price, not a range.',
+    meta: 'AVG. REPLY 2 HRS',
+  },
+  {
+    n: '02',
+    title: 'Pick a window',
+    body: 'Choose a two-hour slot at your home or office. The mobile unit arrives with power, water and paint on board.',
+    meta: '7 DAYS A WEEK',
+  },
+  {
+    n: '03',
+    title: 'Drive it away',
+    body: 'Work finishes in your driveway. No courtesy car, no shop visit, no week without your vehicle.',
+    meta: 'SAME-DAY FINISH',
+  },
+]
+
+/**
+ * Portfolio pieces.
+ *
+ * `composite: true` means the source file is a single side-by-side image with
+ * the damaged state on the left and the finished state on the right — the
+ * comparison slider crops each half rather than needing two files. When you
+ * have separate photographs, drop the flag and pass `before` and `after`.
+ */
+const PORTFOLIO = [
+  {
+    id: 'p1',
+    tag: 'DEEP SCRATCH',
+    vehicle: 'Audi A4 · door skin',
+    duration: '2 HRS ON SITE',
+    composite: true,
+    src: 'https://lh3.googleusercontent.com/aida/AEtjO1VBqQ7bh-1KopYPz04Ws4synn1AOsiU9VS9dxWLOzG6drUf_dmRoLL9zMo9IGqHoSlgwBvXdOlfowcAgGjlAhfqdGnwI9YnDDIoE1aP2ZqWSLmyjJP8Qalm1ODi5f8KqS5VOG-1nLfkXXxeEqsOoTdqAONGVgj-QKBnalx5QaT_kAJlvczDKsyc8gVZEn8gX076zVtxEaA3wBMfdbvpCCJCL7SOE7omHRk68KKEfuYyXJwFROlHCHSOxGbO',
+    quote:
+      'The scratch is completely gone. I didn’t think they could fix it without repainting the whole panel.',
+    author: 'Mark R.',
+    initials: 'MR',
+  },
+  {
+    id: 'p2',
+    tag: 'PAINT CORRECTION',
+    vehicle: 'BMW M340i · hood',
+    duration: '3 HRS ON SITE',
+    composite: true,
+    src: 'https://lh3.googleusercontent.com/aida/AEtjO1XUINJmoQ51ESra0ELivdMwadfjK9c3Nu2WuTNUlKOo7DHPpCh1i5U4yQf7tpD9pziNcEd4F-aE_NOv2ABXoYRcJS0OCpmzJJ1tGOxsEFqgV65TECkzd5mpV_8HIqQepSGLWZaOVH_u8GWlcx3J_sZmuSGwzlxd-w6RRN1890NQLVENfAYr6GdiQeF56UT_-rgxbQnKBKNGCmKK7X-1PfnDD9-7S84bS66jfvXcGVSkhn4sy-lNAOHZ_ioU',
+    quote:
+      'Looks better than the day I drove it off the lot, and it happened in my own garage.',
+    author: 'Sarah L.',
+    initials: 'SL',
+  },
+  {
+    id: 'p3',
+    tag: 'BUMPER REPAIR',
+    vehicle: 'Mercedes C300 · rear bumper',
+    duration: '4 HRS ON SITE',
+    composite: true,
+    src: 'https://lh3.googleusercontent.com/aida/AEtjO1XQWNnsaz4oWjtE2s2ypAJyOUbyJiNr3lLTj7vMWWhUzrdKCAOjx_VPUqKqon0XMfz6dhDmOljYbLA8eJEgGJ0sybGgzTmE59X9L4Gu17Ymv-nafQKHpPvdVHKage52KYnvuWT1xa7iS1RN8i6nOlZuBG1bD1bsgVLDEqI9wLhKxEY5qj-ydVAcjOrDDzWli5oKdPLP66NS7swQy0EB0Jy8So-RWmS-92nQMd2gQ_uzXRXFcU3d0Um5vX7K',
+    quote:
+      'Hundreds less than the body shop quote and done in an afternoon. Highly professional tech.',
+    author: 'David T.',
+    initials: 'DT',
+  },
+]
+
+const REVIEWS = [
+  {
+    quote:
+      'Incredible service. They fixed a deep scratch on my Tesla right in my driveway. The colour match is flawless and it saved me days without the car.',
+    author: 'Michael T.',
+    location: 'MISSISSAUGA, ON',
+    vehicle: 'TESLA MODEL 3',
+  },
+  {
+    quote:
+      'Professional from start to finish. The tech was meticulous and treated my Porsche with real care. The bumper looks brand new.',
+    author: 'Sarah J.',
+    location: 'OAKVILLE, ON',
+    vehicle: 'PORSCHE MACAN',
+  },
+]
+
+const NAV_LINKS = [
+  { href: '#services', label: 'Services' },
+  { href: '#process', label: 'Process' },
+  { href: '#work', label: 'Work' },
+  { href: '#reviews', label: 'Reviews' },
+  { href: '#quote', label: 'Quote' },
+]
+
+const PHONE = '(416) 627-3948'
+const PHONE_HREF = 'tel:4166273948'
+const ADDRESS = '6545 Cedar Rapids Crescent, Mississauga, ON'
+
+/* ===== src/lib/api.js ===== */
+/**
+ * Mock API layer.
+ * =============================================================================
+ * Everything the UI needs to talk to a server goes through this one file, so
+ * swapping in a real backend means rewriting four function bodies and nothing
+ * else. Each function already returns the exact shape the components expect.
+ *
+ * To go live, replace the body of each function with a fetch, e.g.
+ *
+ *   export async function createBooking(payload) {
+ *     const res = await fetch('/api/bookings', {
+ *       method: 'POST',
+ *       headers: { 'Content-Type': 'application/json' },
+ *       body: JSON.stringify(payload),
+ *     })
+ *     if (!res.ok) throw new ApiError(await res.text())
+ *     return res.json()
+ *   }
+ *
+ * Keep throwing ApiError on failure — the UI catches it and shows the message
+ * verbatim, so whatever the server says is what the customer reads.
+ */
+
+const LATENCY = [420, 900] // simulated round-trip, ms
+const FAILURE_RATE = 0 // bump to 0.25 to exercise the error states
+
+class ApiError extends Error {
+  constructor(message, field) {
+    super(message)
+    this.name = 'ApiError'
+    this.field = field // lets the form highlight the offending input
+  }
+}
+
+const wait = () =>
+  new Promise((r) => setTimeout(r, LATENCY[0] + Math.random() * (LATENCY[1] - LATENCY[0])))
+
+async function transport() {
+  await wait()
+  if (Math.random() < FAILURE_RATE) {
+    throw new ApiError("The request didn't reach our dispatch system. Try again.")
+  }
+}
+
+/* --- Store ---------------------------------------------------------------
+   In-memory on purpose: no storage APIs, so this drops into any sandbox
+   unchanged. Point it at your database and the rest of the file still works. */
+
+const STAGES = [
+  { id: 'received', label: 'Request received', note: 'Damage photos logged and reviewed.' },
+  { id: 'scheduled', label: 'Appointment set', note: 'Technician and mobile unit assigned.' },
+  { id: 'enroute', label: 'Technician en route', note: 'Live ETA sent by text on the day.' },
+  { id: 'progress', label: 'Repair underway', note: 'Colour matched, panel prepped, work started.' },
+  { id: 'complete', label: 'Complete', note: 'Final inspection passed. Invoice sent.' },
+]
+
+const bookings = new Map()
+
+// Seeded jobs so the tracker has something real to show on a cold start.
+;[
+  {
+    reference: 'PF-2481',
+    name: 'Mark R.',
+    vehicle: '2022 Tesla Model 3',
+    colour: 'PPSW — Pearl White Multi-Coat',
+    service: 'Scratch removal',
+    stage: 'progress',
+    date: 'Thu 27 Aug',
+    window: '10:00 – 12:00',
+    tech: 'D. Okafor',
+    address: 'Erin Mills, Mississauga',
+  },
+  {
+    reference: 'PF-7752',
+    name: 'Sarah J.',
+    vehicle: '2019 Porsche Macan',
+    colour: 'M5X — Volcano Grey Metallic',
+    service: 'Bumper repair',
+    stage: 'scheduled',
+    date: 'Mon 31 Aug',
+    window: '08:00 – 10:00',
+    tech: 'A. Bianchi',
+    address: 'Oakville, ON',
+  },
+  {
+    reference: 'PF-1039',
+    name: 'David T.',
+    vehicle: '2021 BMW M340i',
+    colour: 'C4A — Portimao Blue',
+    service: 'Paint touch-up',
+    stage: 'complete',
+    date: 'Fri 15 Aug',
+    window: '13:00 – 15:00',
+    tech: 'D. Okafor',
+    address: 'Streetsville, Mississauga',
+  },
+].forEach((b) => bookings.set(b.reference, b))
+
+let counter = 3100
+const nextReference = () => `PF-${++counter}`
+
+/* --- Availability -------------------------------------------------------- */
+
+const HOURS = ['08:00', '10:00', '12:00', '14:00', '16:00']
+
+// Deterministic hash so a given date always returns the same slots. Random
+// availability that reshuffles on every render feels broken to a user.
+function hash(str) {
+  let h = 0
+  for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) | 0
+  return Math.abs(h)
+}
+
+async function getAvailability(dateISO) {
+  await transport()
+  const seed = hash(dateISO)
+  const day = new Date(dateISO + 'T12:00:00').getDay()
+  return HOURS.map((time, i) => ({
+    time,
+    // Sundays closed; otherwise about a third of slots are already taken.
+    available: day === 0 ? false : (seed >> (i * 2)) % 3 !== 0,
+  }))
+}
+
+/* --- Bookings ------------------------------------------------------------ */
+
+async function createBooking(payload) {
+  await transport()
+
+  if (!payload.service) throw new ApiError('Choose a service first.', 'service')
+  if (!payload.vehicle?.trim()) throw new ApiError('Tell us the vehicle make and model.', 'vehicle')
+  if (!payload.date || !payload.time) throw new ApiError('Pick a date and arrival window.', 'date')
+  if (!payload.name?.trim()) throw new ApiError('Add a name for the appointment.', 'name')
+  if (!isEmail(payload.email)) throw new ApiError('That email address looks incomplete.', 'email')
+  if (digits(payload.phone).length < 10)
+    throw new ApiError('A 10-digit phone number lets the tech text an ETA.', 'phone')
+
+  const reference = nextReference()
+  const booking = {
+    ...payload,
+    reference,
+    stage: 'scheduled',
+    tech: 'Assigning',
+    window: windowFor(payload.time),
+    createdAt: new Date().toISOString(),
+  }
+  bookings.set(reference, booking)
+  return booking
+}
+
+async function getRepair(reference) {
+  await transport()
+  const key = String(reference || '').trim().toUpperCase()
+  const booking = bookings.get(key)
+  if (!booking) {
+    throw new ApiError(`No job found for ${key || 'that reference'}. Check the code on your confirmation email.`)
+  }
+  const index = STAGES.findIndex((s) => s.id === booking.stage)
+  return { ...booking, stageIndex: index, stages: STAGES }
+}
+
+/* --- Quote requests ------------------------------------------------------ */
+
+async function submitQuote(payload) {
+  await transport()
+  if (!payload.name?.trim()) throw new ApiError('Add your name so we know who to reply to.', 'name')
+  if (!isEmail(payload.email)) throw new ApiError('That email address looks incomplete.', 'email')
+  if (digits(payload.phone).length < 10) throw new ApiError('Add a 10-digit phone number.', 'phone')
+  if (!payload.vehicle?.trim()) throw new ApiError('Which vehicle are we quoting?', 'vehicle')
+  if (!payload.service) throw new ApiError('Pick the closest service.', 'service')
+  if (!payload.description?.trim() || payload.description.trim().length < 12)
+    throw new ApiError('A sentence or two about the damage speeds up the estimate.', 'description')
+
+  const reference = nextReference()
+  bookings.set(reference, {
+    ...payload,
+    reference,
+    stage: 'received',
+    date: 'Pending',
+    window: 'Pending',
+    tech: 'Unassigned',
+  })
+  return { reference }
+}
+
+/* --- Helpers ------------------------------------------------------------- */
+
+const digits = (v) => String(v || '').replace(/\D/g, '')
+const isEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(v || '').trim())
+
+function windowFor(time) {
+  const [h] = time.split(':').map(Number)
+  return `${time} – ${String(h + 2).padStart(2, '0')}:00`
+}
+
+function formatPhone(value) {
+  const d = digits(value).slice(0, 10)
+  if (d.length < 4) return d
+  if (d.length < 7) return `(${d.slice(0, 3)}) ${d.slice(3)}`
+  return `(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6)}`
+}
+
+/* ===== src/lib/hooks.js ===== */
+/** Adds .is-visible once an element scrolls into view. One-shot: no replay on
+ *  scroll-up, which reads as twitchy on a long page. */
+function useReveal(options = {}) {
+  const ref = useRef(null)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    // Reveals the container and any nested .reveal children, so a grid can
+    // stagger its cards off a single observer.
+    const show = () => {
+      el.classList.add('is-visible')
+      el.querySelectorAll('.reveal').forEach((n) => n.classList.add('is-visible'))
+    }
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      show()
+      return
+    }
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          show()
+          io.disconnect()
+        }
+      },
+      { threshold: 0.12, rootMargin: '0px 0px -60px 0px', ...options }
+    )
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
+  return ref
+}
+
+/** Staggers children of a revealed container by index. */
+function revealDelay(i, step = 70) {
+  return { transitionDelay: `${i * step}ms` }
+}
+
+function useScrolled(threshold = 24) {
+  const [scrolled, setScrolled] = useState(false)
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > threshold)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [threshold])
+  return scrolled
+}
+
+/** Which section is currently under the header. Drives the nav underline. */
+function useActiveSection(ids) {
+  const [active, setActive] = useState(null)
+  useEffect(() => {
+    const sections = ids.map((id) => document.getElementById(id)).filter(Boolean)
+    if (!sections.length) return
+    const io = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0]
+        if (visible) setActive(visible.target.id)
+      },
+      { rootMargin: '-45% 0px -50% 0px', threshold: [0, 0.25, 0.5] }
+    )
+    sections.forEach((s) => io.observe(s))
+    return () => io.disconnect()
+  }, [ids.join('|')])
+  return active
+}
+
+function useBodyLock(locked) {
+  useEffect(() => {
+    if (!locked) return
+    const { overflow, paddingRight } = document.body.style
+    const gap = window.innerWidth - document.documentElement.clientWidth
+    document.body.style.overflow = 'hidden'
+    if (gap > 0) document.body.style.paddingRight = `${gap}px`
+    return () => {
+      document.body.style.overflow = overflow
+      document.body.style.paddingRight = paddingRight
+    }
+  }, [locked])
+}
+
+/* ===== src/components/Icon.jsx ===== */
+/**
+ * Inline SVG icons. The original export pulled Material Symbols over the
+ * network, which flashes unstyled ligature text on slow connections; these
+ * ship with the bundle instead.
+ */
+
+const paths = {
+  wand: (
+    <>
+      <path d="M5 21 21 5" />
+      <path d="m14.5 5.5 4 4" />
+      <path d="M6 3v4M4 5h4M17 15v3M15.5 16.5h3" />
+    </>
+  ),
+  paint: (
+    <>
+      <rect height="8" rx="1.5" width="14" x="4" y="3" />
+      <path d="M11 11v3a2 2 0 0 0 2 2h4a2 2 0 0 1 2 2v3" />
+      <rect height="5" rx="1" width="5" x="8.5" y="16" />
+    </>
+  ),
+  car: (
+    <>
+      <path d="M4 16v3M20 16v3" />
+      <path d="M3 16v-3.2a2 2 0 0 1 .3-1l1.9-3A2 2 0 0 1 6.9 8h10.2a2 2 0 0 1 1.7.9l1.9 3a2 2 0 0 1 .3 1V16z" />
+      <path d="M6.5 13h2M15.5 13h2" />
+    </>
+  ),
+  arrowRight: (
+    <>
+      <path d="M5 12h14" />
+      <path d="m13 6 6 6-6 6" />
+    </>
+  ),
+  arrowLeft: (
+    <>
+      <path d="M19 12H5" />
+      <path d="m11 18-6-6 6-6" />
+    </>
+  ),
+  chevronRight: <path d="m9 6 6 6-6 6" />,
+  chevronLeft: <path d="m15 6-6 6 6 6" />,
+  check: <path d="m4 12.5 5 5L20 6.5" />,
+  close: (
+    <>
+      <path d="M6 6 18 18" />
+      <path d="M18 6 6 18" />
+    </>
+  ),
+  menu: (
+    <>
+      <path d="M4 7h16M4 12h16M4 17h16" />
+    </>
+  ),
+  phone: (
+    <path d="M15.5 21A12.5 12.5 0 0 1 3 8.5 2.5 2.5 0 0 1 5.5 6h1.6a1 1 0 0 1 1 .8l.6 2.6a1 1 0 0 1-.5 1.1l-1.3.7a10 10 0 0 0 4.9 4.9l.7-1.3a1 1 0 0 1 1.1-.5l2.6.6a1 1 0 0 1 .8 1v1.6A2.5 2.5 0 0 1 15.5 21z" />
+  ),
+  upload: (
+    <>
+      <path d="M12 16V4" />
+      <path d="m7.5 8.5 4.5-4.5 4.5 4.5" />
+      <path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" />
+    </>
+  ),
+  send: (
+    <>
+      <path d="M21 3 10.5 13.5" />
+      <path d="M21 3 14.5 21l-4-8-8-4z" />
+    </>
+  ),
+  clock: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7v5.2l3 1.8" />
+    </>
+  ),
+  pin: (
+    <>
+      <path d="M12 21s7-5.7 7-11a7 7 0 1 0-14 0c0 5.3 7 11 7 11z" />
+      <circle cx="12" cy="10" r="2.5" />
+    </>
+  ),
+  search: (
+    <>
+      <circle cx="11" cy="11" r="7" />
+      <path d="m16.5 16.5 4 4" />
+    </>
+  ),
+  calendar: (
+    <>
+      <rect height="16" rx="2" width="18" x="3" y="5" />
+      <path d="M3 10h18M8 3v4M16 3v4" />
+    </>
+  ),
+  shield: (
+    <>
+      <path d="M12 3 5 6v5.5c0 4.3 3 8.2 7 9.5 4-1.3 7-5.2 7-9.5V6z" />
+      <path d="m9 12 2 2 4-4" />
+    </>
+  ),
+  sliders: (
+    <>
+      <path d="M12 3v18" />
+      <path d="M7 8 3 12l4 4M17 8l4 4-4 4" />
+    </>
+  ),
+}
+
+function Icon({ name, size = 20, className = '', strokeWidth = 1.6, ...rest }) {
+  const d = paths[name]
+  if (!d) return null
+  return (
+    <svg
+      aria-hidden="true"
+      className={className}
+      fill="none"
+      height={size}
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={strokeWidth}
+      viewBox="0 0 24 24"
+      width={size}
+      {...rest}
+    >
+      {d}
+    </svg>
+  )
+}
+
+function Stars({ count = 5, size = 14, className = '' }) {
+  return (
+    <span aria-label={`${count} out of 5 stars`} className={`inline-flex gap-[3px] ${className}`}>
+      {Array.from({ length: count }).map((_, i) => (
+        <svg key={i} aria-hidden="true" fill="currentColor" height={size} viewBox="0 0 24 24" width={size}>
+          <path d="m12 3 2.6 5.6 6.1.8-4.5 4.2 1.2 6-5.4-3-5.4 3 1.2-6L3.3 9.4l6.1-.8z" />
+        </svg>
+      ))}
+    </span>
+  )
+}
+
+function Spinner({ size = 16, className = '' }) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={className}
+      height={size}
+      style={{ animation: 'spin 700ms linear infinite' }}
+      viewBox="0 0 24 24"
+      width={size}
+    >
+      <circle cx="12" cy="12" fill="none" opacity="0.25" r="9" stroke="currentColor" strokeWidth="2.5" />
+      <path
+        d="M21 12a9 9 0 0 0-9-9"
+        fill="none"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeWidth="2.5"
+      />
+      <style>{'@keyframes spin{to{transform:rotate(360deg)}}'}</style>
+    </svg>
+  )
+}
+
+/* ===== src/components/SmartImage.jsx ===== */
+/**
+ * The design export references images on a CDN that expires them. Rather than
+ * leaving a broken-image glyph on a dark page, a failed load falls back to a
+ * tonal panel that still reads as part of the layout.
+ */
+function SmartImage({ src, alt, className = '', style, label, ...rest }) {
+  const [failed, setFailed] = useState(false)
+
+  if (failed) {
+    return (
+      <div
+        aria-label={alt}
+        className={`s-container flex items-center justify-center ${className}`}
+        role="img"
+        style={style}
+      >
+        <div className="c-variant flex flex-col items-center gap-2 px-4 text-center opacity-45">
+          <Icon name="car" size={26} />
+          {label !== false && <span className="t-caps text-[10px]">{label || 'IMAGE UNAVAILABLE'}</span>}
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <img
+      alt={alt}
+      className={className}
+      loading="lazy"
+      onError={() => setFailed(true)}
+      src={src}
+      style={style}
+      {...rest}
+    />
+  )
+}
+
+/* ===== src/components/Toast.jsx ===== */
+const ToastContext = createContext(() => {})
+const useToast = () => useContext(ToastContext)
+
+let id = 0
+
+function ToastProvider({ children }) {
+  const [items, setItems] = useState([])
+
+  const dismiss = useCallback((key) => setItems((t) => t.filter((i) => i.key !== key)), [])
+
+  const push = useCallback(
+    (message, tone = 'info') => {
+      const key = ++id
+      setItems((t) => [...t, { key, message, tone }])
+      setTimeout(() => dismiss(key), 5200)
+    },
+    [dismiss]
+  )
+
+  const value = useMemo(() => push, [push])
+
+  return (
+    <ToastContext.Provider value={value}>
+      {children}
+      <div
+        aria-live="polite"
+        className="fixed bottom-5 left-1/2 z-[100] flex w-[calc(100%-32px)] max-w-sm -translate-x-1/2 flex-col gap-2 sm:left-auto sm:right-6 sm:translate-x-0"
+      >
+        {items.map((t) => (
+          <div
+            key={t.key}
+            className="s-high hairline flex items-start gap-3 rounded px-4 py-3 shadow-[0_18px_40px_-20px_#000]"
+            style={{
+              animation: 'toast-in .28s cubic-bezier(.2,.7,.3,1) both',
+              borderLeft: `2px solid ${
+                t.tone === 'error' ? 'var(--error)' : 'var(--primary-container)'
+              }`,
+            }}
+          >
+            <span
+              className="mt-[2px] shrink-0"
+              style={{ color: t.tone === 'error' ? 'var(--error)' : 'var(--primary)' }}
+            >
+              <Icon name={t.tone === 'error' ? 'close' : 'check'} size={16} strokeWidth={2.2} />
+            </span>
+            <p className="c-on flex-1 text-[14px] leading-snug">{t.message}</p>
+            <button
+              aria-label="Dismiss"
+              className="c-variant shrink-0 opacity-60 transition-opacity hover:opacity-100"
+              onClick={() => dismiss(t.key)}
+              type="button"
+            >
+              <Icon name="close" size={15} />
+            </button>
+          </div>
+        ))}
+      </div>
+      <style>{`@keyframes toast-in{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}`}</style>
+    </ToastContext.Provider>
+  )
+}
+
+/* ===== src/components/Modal.jsx ===== */
+const FOCUSABLE =
+  'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])'
+
+function Modal({ open, onClose, label, children, width = 'max-w-3xl' }) {
+  const panel = useRef(null)
+  const restore = useRef(null)
+  useBodyLock(open)
+
+  useEffect(() => {
+    if (!open) return
+    restore.current = document.activeElement
+
+    const first = panel.current?.querySelector(FOCUSABLE)
+    // Delay a frame so the entry animation doesn't fight the scroll-into-view.
+    const t = setTimeout(() => (first || panel.current)?.focus(), 40)
+
+    const onKey = (e) => {
+      if (e.key === 'Escape') return onClose()
+      if (e.key !== 'Tab') return
+      const nodes = [...(panel.current?.querySelectorAll(FOCUSABLE) || [])]
+      if (!nodes.length) return
+      const [start, end] = [nodes[0], nodes[nodes.length - 1]]
+      if (e.shiftKey && document.activeElement === start) {
+        e.preventDefault()
+        end.focus()
+      } else if (!e.shiftKey && document.activeElement === end) {
+        e.preventDefault()
+        start.focus()
+      }
+    }
+
+    document.addEventListener('keydown', onKey)
+    return () => {
+      clearTimeout(t)
+      document.removeEventListener('keydown', onKey)
+      restore.current?.focus?.()
+    }
+  }, [open, onClose])
+
+  if (!open) return null
+
+  return (
+    <div className="fixed inset-0 z-[90] flex items-end justify-center sm:items-center">
+      <div
+        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+        onClick={onClose}
+        style={{ animation: 'fade .2s ease both' }}
+      />
+      <div
+        ref={panel}
+        aria-label={label}
+        aria-modal="true"
+        className={`s-low hairline relative flex max-h-[92vh] w-full ${width} flex-col overflow-hidden rounded-t-lg sm:rounded-lg`}
+        role="dialog"
+        style={{
+          animation: 'panel-in .32s cubic-bezier(.2,.7,.3,1) both',
+          boxShadow: '0 40px 80px -30px #000',
+        }}
+        tabIndex={-1}
+      >
+        <button
+          aria-label="Close"
+          className="c-variant absolute right-3 top-3 z-10 rounded p-2 transition-colors hover:bg-white/5 hover:text-white"
+          onClick={onClose}
+          type="button"
+        >
+          <Icon name="close" size={18} />
+        </button>
+        {children}
+      </div>
+      <style>{`
+        @keyframes fade{from{opacity:0}to{opacity:1}}
+        @keyframes panel-in{from{opacity:0;transform:translateY(24px) scale(.99)}to{opacity:1;transform:none}}
+        @media (prefers-reduced-motion: reduce){
+          [role=dialog]{animation:none !important}
+        }
+      `}</style>
+    </div>
+  )
+}
+
+/* ===== src/components/BeforeAfter.jsx ===== */
+/**
+ * Before/after comparison slider.
+ *
+ * Two source shapes are supported:
+ *
+ *   <BeforeAfter before="/damaged.jpg" after="/repaired.jpg" />
+ *   <BeforeAfter src="/pair.jpg" composite />
+ *
+ * `composite` handles the portfolio photography from the design export, which
+ * ships each pair as one side-by-side file — damaged on the left, finished on
+ * the right. Each half is cropped out of the same source instead of needing
+ * two requests.
+ *
+ * The handle is a real slider: drag it, or focus it and use the arrow keys.
+ */
+function BeforeAfter({ before, after, src, composite = false, alt = '', className = '' }) {
+  const [pos, setPos] = useState(52) // start just off-centre so it reads as movable
+  const [dragging, setDragging] = useState(false)
+  const frame = useRef(null)
+
+  const setFromClientX = useCallback((clientX) => {
+    const box = frame.current?.getBoundingClientRect()
+    if (!box) return
+    const next = ((clientX - box.left) / box.width) * 100
+    setPos(Math.min(100, Math.max(0, next)))
+  }, [])
+
+  useEffect(() => {
+    if (!dragging) return
+    const move = (e) => {
+      e.preventDefault()
+      setFromClientX(e.touches ? e.touches[0].clientX : e.clientX)
+    }
+    const stop = () => setDragging(false)
+    window.addEventListener('mousemove', move)
+    window.addEventListener('mouseup', stop)
+    window.addEventListener('touchmove', move, { passive: false })
+    window.addEventListener('touchend', stop)
+    return () => {
+      window.removeEventListener('mousemove', move)
+      window.removeEventListener('mouseup', stop)
+      window.removeEventListener('touchmove', move)
+      window.removeEventListener('touchend', stop)
+    }
+  }, [dragging, setFromClientX])
+
+  const onKeyDown = (e) => {
+    const step = e.shiftKey ? 10 : 3
+    if (e.key === 'ArrowLeft') setPos((p) => Math.max(0, p - step))
+    else if (e.key === 'ArrowRight') setPos((p) => Math.min(100, p + step))
+    else if (e.key === 'Home') setPos(0)
+    else if (e.key === 'End') setPos(100)
+    else return
+    e.preventDefault()
+  }
+
+  // In composite mode each layer renders the source at 2x width and slides it
+  // so the correct half fills the frame.
+  const layerImg = (side) =>
+    composite
+      ? { src, style: { width: '200%', height: '100%', objectFit: 'cover', marginLeft: side === 'after' ? '-100%' : 0 } }
+      : { src: side === 'after' ? after : before, style: { width: '100%', height: '100%', objectFit: 'cover' } }
+
+  const afterLayer = layerImg('after')
+  const beforeLayer = layerImg('before')
+
+  return (
+    <div
+      ref={frame}
+      className={`relative select-none overflow-hidden ${className}`}
+      onMouseDown={(e) => {
+        setDragging(true)
+        setFromClientX(e.clientX)
+      }}
+      onTouchStart={(e) => {
+        setDragging(true)
+        setFromClientX(e.touches[0].clientX)
+      }}
+      style={{ cursor: dragging ? 'ew-resize' : 'pointer', touchAction: 'pan-y' }}
+    >
+      {/* Repaired state sits underneath and is revealed as the handle moves left */}
+      <div className="absolute inset-0 overflow-hidden">
+        <SmartImage alt={`${alt} after repair`} label="AFTER" {...afterLayer} draggable={false} />
+      </div>
+
+      {/* Damaged state clipped to the handle position */}
+      <div
+        className="absolute inset-0 overflow-hidden"
+        style={{ clipPath: `inset(0 ${100 - pos}% 0 0)` }}
+      >
+        <SmartImage alt={`${alt} before repair`} label="BEFORE" {...beforeLayer} draggable={false} />
+      </div>
+
+      <span
+        className="t-caps pointer-events-none absolute left-3 top-3 rounded-sm px-2 py-1 text-[10px] transition-opacity"
+        style={{
+          background: 'rgba(11,15,18,.72)',
+          color: 'var(--on-surface)',
+          backdropFilter: 'blur(4px)',
+          opacity: pos > 18 ? 1 : 0,
+        }}
+      >
+        Before
+      </span>
+      <span
+        className="t-caps pointer-events-none absolute right-3 top-3 rounded-sm px-2 py-1 text-[10px] transition-opacity"
+        style={{
+          background: 'rgba(11,15,18,.72)',
+          color: 'var(--primary)',
+          backdropFilter: 'blur(4px)',
+          opacity: pos < 82 ? 1 : 0,
+        }}
+      >
+        After
+      </span>
+
+      {/* Silver vertical handle, per the brief */}
+      <div
+        aria-label={`Reveal repair — ${Math.round(pos)}% before`}
+        aria-orientation="horizontal"
+        aria-valuemax={100}
+        aria-valuemin={0}
+        aria-valuenow={Math.round(pos)}
+        className="absolute inset-y-0 z-10 w-px"
+        onKeyDown={onKeyDown}
+        role="slider"
+        style={{
+          left: `${pos}%`,
+          background: 'var(--secondary)',
+          boxShadow: '0 0 12px rgba(0,0,0,.6)',
+        }}
+        tabIndex={0}
+      >
+        <span
+          className="absolute left-1/2 top-1/2 flex h-9 w-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full"
+          style={{
+            background: 'var(--secondary)',
+            color: '#101417',
+            boxShadow: '0 2px 10px rgba(0,0,0,.55)',
+            transform: `translate(-50%,-50%) scale(${dragging ? 1.1 : 1})`,
+            transition: 'transform .15s ease',
+          }}
+        >
+          <svg fill="none" height="14" stroke="currentColor" strokeLinecap="round" strokeWidth="2" viewBox="0 0 24 24" width="14">
+            <path d="m10 7-5 5 5 5M14 7l5 5-5 5" />
+          </svg>
+        </span>
+      </div>
+    </div>
+  )
+}
+
+/* ===== src/components/SectionHead.jsx ===== */
+function SectionHead({ eyebrow, title, lead, center = false, className = '' }) {
+  const ref = useReveal()
+  return (
+    <div
+      ref={ref}
+      className={`reveal max-w-2xl ${center ? 'mx-auto text-center' : ''} ${className}`}
+    >
+      {eyebrow && (
+        <div className={`flex items-center gap-3 ${center ? 'justify-center' : ''}`}>
+          <span className="h-px w-6" style={{ background: 'var(--primary-container)' }} />
+          <span className="t-caps c-primary">{eyebrow}</span>
+        </div>
+      )}
+      <h2 className="t-h1 c-on mt-4">{title}</h2>
+      {lead && <p className="t-body-lg c-variant mt-4">{lead}</p>}
+    </div>
+  )
+}
+
+/* ===== src/components/Nav.jsx ===== */
+const SECTION_IDS = NAV_LINKS.map((l) => l.href.slice(1))
+
+function Nav({ onBook, onTrack }) {
+  const [open, setOpen] = useState(false)
+  const scrolled = useScrolled(20)
+  const active = useActiveSection(SECTION_IDS)
+  useBodyLock(open)
+
+  useEffect(() => {
+    const close = () => setOpen(false)
+    window.addEventListener('resize', close)
+    return () => window.removeEventListener('resize', close)
+  }, [])
+
+  const go = (e, href) => {
+    e.preventDefault()
+    setOpen(false)
+    document.querySelector(href)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
+  return (
+    <>
+      <a
+        className="btn btn-primary sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[120] focus:px-4 focus:py-2"
+        href="#main"
+      >
+        Skip to content
+      </a>
+
+      <nav
+        className="fixed inset-x-0 top-0 z-[80] transition-all duration-300"
+        style={{
+          background: scrolled ? 'rgba(16,20,23,.88)' : 'transparent',
+          backdropFilter: scrolled ? 'blur(14px)' : 'none',
+          borderBottom: `1px solid ${
+            scrolled ? 'color-mix(in srgb, var(--outline-variant) 22%, transparent)' : 'transparent'
+          }`,
+        }}
+      >
+        <div className="mx-auto flex max-w-container items-center justify-between px-gutter py-4">
+          <a
+            className="flex items-center gap-3"
+            href="#top"
+            onClick={(e) => {
+              e.preventDefault()
+              window.scrollTo({ top: 0, behavior: 'smooth' })
+            }}
+          >
+            <Wordmark />
+          </a>
+
+          <div className="hidden items-center gap-7 lg:flex">
+            {NAV_LINKS.map((l) => {
+              const isActive = active === l.href.slice(1)
+              return (
+                <a
+                  key={l.href}
+                  className="t-caps relative py-2 transition-colors"
+                  href={l.href}
+                  onClick={(e) => go(e, l.href)}
+                  style={{ color: isActive ? 'var(--primary)' : 'var(--on-surface-variant)' }}
+                >
+                  {l.label}
+                  <span
+                    className="absolute -bottom-px left-0 h-px transition-all duration-300"
+                    style={{
+                      width: isActive ? '100%' : '0%',
+                      background: 'var(--primary-container)',
+                    }}
+                  />
+                </a>
+              )
+            })}
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button className="btn btn-ghost hidden px-4 py-3 sm:inline-flex" onClick={onTrack} type="button">
+              <Icon name="search" size={14} />
+              Track repair
+            </button>
+            <button className="btn btn-primary px-5 py-3" onClick={onBook} type="button">
+              Book now
+            </button>
+            <button
+              aria-expanded={open}
+              aria-label="Menu"
+              className="btn btn-ghost px-3 py-3 lg:hidden"
+              onClick={() => setOpen((o) => !o)}
+              type="button"
+            >
+              <Icon name={open ? 'close' : 'menu'} size={18} />
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      {/* Mobile drawer */}
+      <div
+        className="fixed inset-0 z-[79] lg:hidden"
+        style={{
+          pointerEvents: open ? 'auto' : 'none',
+          opacity: open ? 1 : 0,
+          transition: 'opacity .25s ease',
+        }}
+      >
+        <div className="absolute inset-0 bg-black/60" onClick={() => setOpen(false)} />
+        <div
+          className="s-low hairline-b absolute inset-x-0 top-0 px-gutter pb-6 pt-24"
+          style={{
+            transform: open ? 'none' : 'translateY(-12px)',
+            transition: 'transform .3s cubic-bezier(.2,.7,.3,1)',
+          }}
+        >
+          <div className="flex flex-col">
+            {NAV_LINKS.map((l, i) => (
+              <a
+                key={l.href}
+                className="t-h3 c-on hairline-b py-4 transition-colors"
+                href={l.href}
+                onClick={(e) => go(e, l.href)}
+                style={{ transitionDelay: `${i * 20}ms` }}
+              >
+                {l.label}
+              </a>
+            ))}
+            <button
+              className="btn btn-ghost mt-5 w-full py-4"
+              onClick={() => {
+                setOpen(false)
+                onTrack()
+              }}
+              type="button"
+            >
+              <Icon name="search" size={14} />
+              Track a repair
+            </button>
+          </div>
+        </div>
+      </div>
+    </>
+  )
+}
+
+function Wordmark() {
+  return (
+    <span className="flex items-center gap-2.5">
+      <span
+        className="relative flex h-8 w-8 items-center justify-center rounded-sm"
+        style={{ background: 'var(--primary-container)' }}
+      >
+        <span
+          className="t-mono text-[15px] font-bold leading-none"
+          style={{ color: '#fff' }}
+        >
+          P
+        </span>
+        <span
+          className="absolute -bottom-px left-1 right-1 h-px"
+          style={{ background: 'rgba(255,255,255,.55)' }}
+        />
+      </span>
+      <span className="t-h3 c-on leading-none tracking-tight">
+        Paint Force<span className="c-primary">.</span>
+      </span>
+    </span>
+  )
+}
+
+/* ===== src/components/Hero.jsx ===== */
+const RAIL = [
+  { k: 'SERVICE AREA', v: 'MISSISSAUGA · OAKVILLE · ETOBICOKE' },
+  { k: 'NEXT AVAILABLE', v: 'THU 08:00' },
+  { k: 'COLOUR MATCH', v: 'VIN-CODED' },
+  { k: 'WARRANTY', v: 'LIFETIME ON WORKMANSHIP' },
+]
+
+function Hero({ onBook }) {
+  return (
+    <header className="relative flex min-h-[92vh] items-center overflow-hidden pt-24" id="top">
+      <div className="absolute inset-0 z-0">
+        <SmartImage
+          alt="A technician machine-polishing a black panel under controlled lighting"
+          className="h-full w-full object-cover"
+          label={false}
+          src={HERO_IMAGE}
+          style={{ opacity: 0.42 }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              'linear-gradient(to top, var(--background) 6%, rgba(16,20,23,.86) 45%, rgba(16,20,23,.35) 100%)',
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              'linear-gradient(to right, var(--background) 0%, rgba(16,20,23,.55) 48%, transparent 78%)',
+          }}
+        />
+      </div>
+
+      <div className="relative z-10 mx-auto w-full max-w-container px-gutter pb-44 pt-8 md:pb-36">
+        <div className="max-w-3xl">
+          <div className="fade" style={{ animationDelay: '80ms' }}>
+            <span className="s-high hairline inline-flex items-center gap-2 rounded-full px-3.5 py-2">
+              <span className="c-primary flex">
+                <Stars size={12} />
+              </span>
+              <span className="t-caps c-variant text-[11px]">4.9 ON GOOGLE · 990+ REVIEWS</span>
+            </span>
+          </div>
+
+          <h1 className="t-display c-on mt-6">
+            <span className="fade block" style={{ animationDelay: '160ms' }}>
+              Showroom finish,
+            </span>
+            <span className="fade block c-primary" style={{ animationDelay: '260ms' }}>
+              in your driveway.
+            </span>
+          </h1>
+
+          <p
+            className="t-body-lg c-variant fade mt-6 max-w-xl"
+            style={{ animationDelay: '360ms' }}
+          >
+            Paint and scratch repair that comes to you. A fully equipped mobile unit handles the work
+            at your home or office — no body-shop queue, no week without your car.
+          </p>
+
+          <div className="fade mt-9 flex flex-wrap items-center gap-3" style={{ animationDelay: '440ms' }}>
+            <button className="btn btn-primary px-7 py-4" onClick={onBook} type="button">
+              Book a repair
+              <Icon name="arrowRight" size={15} />
+            </button>
+            <a
+              className="btn btn-ghost px-7 py-4"
+              href="#work"
+              onClick={(e) => {
+                e.preventDefault()
+                document.querySelector('#work')?.scrollIntoView({ behavior: 'smooth' })
+              }}
+            >
+              See the work
+            </a>
+            <a className="btn btn-quiet px-3 py-4" href={PHONE_HREF}>
+              <Icon name="phone" size={15} />
+              {PHONE}
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {/* Signature: a technical readout strip, set in the mono utility face */}
+      <div
+        className="fade absolute inset-x-0 bottom-0 z-10 hairline-t"
+        style={{ animationDelay: '600ms', background: 'rgba(11,15,18,.55)', backdropFilter: 'blur(8px)' }}
+      >
+        <dl className="mx-auto grid max-w-container grid-cols-2 px-gutter md:grid-cols-4">
+          {RAIL.map((item, i) => (
+            <div
+              key={item.k}
+              className="py-4 md:py-5"
+              style={{
+                borderLeft: i === 0 ? 'none' : '1px solid color-mix(in srgb, var(--outline-variant) 22%, transparent)',
+                paddingLeft: i === 0 ? 0 : '20px',
+              }}
+            >
+              <dt className="t-caps text-[10px]" style={{ color: 'color-mix(in srgb, var(--on-surface-variant) 55%, transparent)' }}>
+                {item.k}
+              </dt>
+              <dd className="t-mono c-on mt-2 text-[11px] leading-tight tracking-wide md:text-[12px]">
+                {item.v}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+
+      <style>{`
+        .fade { opacity: 0; animation: hero-fade .7s cubic-bezier(.2,.7,.3,1) both; }
+        @keyframes hero-fade { from { opacity:0; transform: translateY(18px) } to { opacity:1; transform:none } }
+        @media (prefers-reduced-motion: reduce) { .fade { animation: none; opacity: 1 } }
+      `}</style>
+    </header>
+  )
+}
+
+/* ===== src/components/Services.jsx ===== */
+function Services({ onBook }) {
+  const ref = useReveal()
+  const [open, setOpen] = useState(null)
+
+  return (
+    <section className="s-low py-section" id="services">
+      <div className="mx-auto max-w-container px-gutter">
+        <SectionHead
+          eyebrow="Services"
+          lead="Three repairs cover most of what a daily-driven car picks up. Each one is priced up front and finished in a single visit."
+          title="What we fix."
+        />
+
+        <div ref={ref} className="reveal mt-14 grid gap-4 md:grid-cols-3">
+          {SERVICES.map((s, i) => {
+            const isOpen = open === s.id
+            return (
+              <article
+                key={s.id}
+                className="reveal card card-interactive group relative flex flex-col overflow-hidden p-6"
+                style={revealDelay(i)}
+              >
+                <span
+                  className="absolute inset-x-0 top-0 h-px opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                  style={{ background: 'linear-gradient(to right, var(--primary-container), transparent)' }}
+                />
+
+                <div className="flex items-start justify-between">
+                  <span
+                    className="s-container hairline flex h-11 w-11 items-center justify-center rounded"
+                    style={{ color: 'var(--primary)' }}
+                  >
+                    <Icon name={s.icon} size={20} />
+                  </span>
+                  <span className="chip">{s.est}</span>
+                </div>
+
+                <h3 className="t-h2 c-on mt-6">{s.name}</h3>
+                <p className="t-body c-variant mt-3 flex-1">{s.blurb}</p>
+
+                <div
+                  className="grid transition-all duration-300"
+                  style={{
+                    gridTemplateRows: isOpen ? '1fr' : '0fr',
+                    opacity: isOpen ? 1 : 0,
+                    marginTop: isOpen ? 20 : 0,
+                  }}
+                >
+                  <ul className="overflow-hidden">
+                    {s.detail.map((d) => (
+                      <li key={d} className="t-body c-variant flex gap-3 py-1.5 text-[15px]">
+                        <span className="c-primary mt-[5px] shrink-0">
+                          <Icon name="check" size={13} strokeWidth={2.4} />
+                        </span>
+                        {d}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="hairline-t mt-6 flex items-center justify-between pt-5">
+                  <span className="t-mono c-on text-[13px]">{s.price}</span>
+                  <div className="flex items-center gap-1">
+                    <button
+                      aria-expanded={isOpen}
+                      className="btn btn-quiet px-2 py-2"
+                      onClick={() => setOpen(isOpen ? null : s.id)}
+                      type="button"
+                    >
+                      {isOpen ? 'Less' : 'Details'}
+                      <span
+                        className="transition-transform duration-300"
+                        style={{ transform: isOpen ? 'rotate(-90deg)' : 'rotate(90deg)' }}
+                      >
+                        <Icon name="chevronRight" size={13} />
+                      </span>
+                    </button>
+                    <button
+                      className="btn btn-ghost px-3 py-2"
+                      onClick={() => onBook(s.id)}
+                      type="button"
+                    >
+                      Book
+                    </button>
+                  </div>
+                </div>
+              </article>
+            )
+          })}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/* ===== src/components/Process.jsx ===== */
+function Process({ onBook }) {
+  const ref = useReveal()
+
+  return (
+    <section className="hairline-t hairline-b py-section" id="process">
+      <div className="mx-auto max-w-container px-gutter">
+        <SectionHead
+          center
+          eyebrow="How it works"
+          lead="Three steps, one visit. Order matters here — nothing starts until the price is agreed."
+          title="From photo to finished."
+        />
+
+        <ol ref={ref} className="reveal relative mt-16 grid gap-10 md:grid-cols-3 md:gap-8">
+          {/* Connector: a thin silver rule the markers sit on */}
+          <span
+            aria-hidden="true"
+            className="absolute hidden md:block"
+            style={{
+              top: 22,
+              left: '16.6%',
+              right: '16.6%',
+              height: 1,
+              background:
+                'linear-gradient(to right, transparent, color-mix(in srgb, var(--secondary) 30%, transparent) 12%, color-mix(in srgb, var(--secondary) 30%, transparent) 88%, transparent)',
+            }}
+          />
+
+          {PROCESS.map((step, i) => (
+            <li
+              key={step.n}
+              className="reveal relative flex flex-col md:items-center md:text-center"
+              style={revealDelay(i, 110)}
+            >
+              <span
+                className="s-container flex h-11 w-11 shrink-0 items-center justify-center rounded-full"
+                style={{
+                  border: '1px solid color-mix(in srgb, var(--secondary) 40%, transparent)',
+                  color: 'var(--primary)',
+                }}
+              >
+                <span className="t-mono text-[13px] font-bold tracking-wider">{step.n}</span>
+              </span>
+
+              <span className="t-caps mt-5 text-[10px]" style={{ color: 'color-mix(in srgb, var(--on-surface-variant) 60%, transparent)' }}>
+                {step.meta}
+              </span>
+              <h3 className="t-h2 c-on mt-2">{step.title}</h3>
+              <p className="t-body c-variant mt-3 max-w-xs md:mx-auto">{step.body}</p>
+            </li>
+          ))}
+        </ol>
+
+        <div className="mt-14 flex justify-center">
+          <button className="btn btn-primary px-7 py-4" onClick={() => onBook()} type="button">
+            Start with step one
+          </button>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/* ===== src/components/Portfolio.jsx ===== */
+function Portfolio() {
+  const ref = useReveal()
+
+  return (
+    <section className="s-lowest py-section" id="work">
+      <div className="mx-auto max-w-container px-gutter">
+        <SectionHead
+          eyebrow="Recent work"
+          lead="Drag any handle to see the panel before and after. Every one of these was finished on a driveway, not in a shop."
+          title="Real cars. Real panels."
+        />
+
+        <div ref={ref} className="reveal mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {PORTFOLIO.map((item, i) => (
+            <article
+              key={item.id}
+              className="reveal card card-interactive flex flex-col overflow-hidden"
+              style={revealDelay(i, 90)}
+            >
+              <BeforeAfter
+                alt={item.vehicle}
+                className="aspect-[4/3] w-full"
+                composite={item.composite}
+                src={item.src}
+              />
+
+              <div className="flex flex-1 flex-col p-5">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="t-caps c-primary text-[10px]">{item.tag}</span>
+                  <span className="t-mono c-variant flex items-center gap-1.5 text-[11px] opacity-70">
+                    <Icon name="clock" size={12} />
+                    {item.duration}
+                  </span>
+                </div>
+
+                <p className="t-h3 c-on mt-2 text-[16px]">{item.vehicle}</p>
+
+                <p className="t-body c-variant mt-4 flex-1 text-[15px] italic">“{item.quote}”</p>
+
+                <div className="hairline-t mt-5 flex items-center gap-3 pt-4">
+                  <span
+                    className="s-highest flex h-8 w-8 items-center justify-center rounded-full text-[11px] font-semibold"
+                    style={{ color: 'var(--on-surface-variant)' }}
+                  >
+                    {item.initials}
+                  </span>
+                  <span className="flex-1">
+                    <span className="c-on block text-[14px] font-medium">{item.author}</span>
+                    <span className="t-caps c-variant block text-[9px] opacity-60">Verified customer</span>
+                  </span>
+                  <span className="c-primary">
+                    <Stars size={12} />
+                  </span>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+
+        <p className="t-caps c-variant mt-8 flex items-center gap-2 opacity-55">
+          <Icon name="sliders" size={13} />
+          Drag, or focus a handle and use the arrow keys
+        </p>
+      </div>
+    </section>
+  )
+}
+
+/* ===== src/components/Reviews.jsx ===== */
+function Reviews() {
+  const ref = useReveal()
+
+  return (
+    <section className="s-low py-section" id="reviews">
+      <div className="mx-auto max-w-container px-gutter">
+        <SectionHead eyebrow="Reviews" title="What owners say." />
+
+        <div ref={ref} className="reveal mt-12 grid gap-5 md:grid-cols-2">
+          {REVIEWS.map((r, i) => (
+            <figure
+              key={r.author}
+              className="reveal card flex flex-col p-7 md:p-8"
+              style={{
+                ...revealDelay(i, 110),
+                borderLeft: '2px solid color-mix(in srgb, var(--primary-container) 70%, transparent)',
+              }}
+            >
+              <span className="c-primary">
+                <Stars size={15} />
+              </span>
+              <blockquote className="t-body-lg c-on mt-5 flex-1">“{r.quote}”</blockquote>
+              <figcaption className="hairline-t mt-6 flex items-end justify-between gap-4 pt-5">
+                <span>
+                  <span className="t-h3 c-on block text-[16px]">{r.author}</span>
+                  <span className="t-caps c-variant mt-1.5 block text-[10px] opacity-65">
+                    {r.location}
+                  </span>
+                </span>
+                <span className="t-mono c-variant text-right text-[10px] tracking-widest opacity-50">
+                  {r.vehicle}
+                </span>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/* ===== src/components/CTA.jsx ===== */
+function CTA({ onBook }) {
+  const ref = useReveal()
+
+  return (
+    <section className="s-container relative overflow-hidden py-section">
+      <div
+        aria-hidden="true"
+        className="absolute inset-0"
+        style={{
+          background:
+            'radial-gradient(120% 80% at 50% 0%, color-mix(in srgb, var(--primary-container) 12%, transparent), transparent 60%)',
+        }}
+      />
+      <div ref={ref} className="reveal relative mx-auto flex max-w-3xl flex-col items-center px-gutter text-center">
+        <span className="t-caps c-primary">Next slot Thursday 08:00</span>
+        <h2 className="t-h1 c-on mt-5">Book the visit.</h2>
+        <p className="t-body-lg c-variant mt-4 max-w-xl">
+          Pick a two-hour window and a technician comes to you. Most jobs are quoted the same day.
+        </p>
+        <div className="mt-9 flex flex-col items-center gap-5 sm:flex-row">
+          <button className="btn btn-primary px-9 py-4" onClick={() => onBook()} type="button">
+            Choose a time
+            <Icon name="arrowRight" size={15} />
+          </button>
+          <span className="t-caps c-variant opacity-50">or</span>
+          <a className="t-h2 c-primary flex items-center gap-2.5 transition-colors hover:opacity-80" href={PHONE_HREF}>
+            <Icon name="phone" size={19} />
+            {PHONE}
+          </a>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/* ===== src/components/QuoteForm.jsx ===== */
+const EMPTY = { name: '', email: '', phone: '', vehicle: '', service: '', description: '' }
+
+function QuoteForm() {
+  const ref = useReveal()
+  const toast = useToast()
+  const [values, setValues] = useState(EMPTY)
+  const [error, setError] = useState(null) // { message, field }
+  const [busy, setBusy] = useState(false)
+  const [done, setDone] = useState(null)
+  const [photos, setPhotos] = useState([])
+  const [dragging, setDragging] = useState(false)
+  const fileInput = useRef(null)
+
+  useEffect(() => () => photos.forEach((p) => URL.revokeObjectURL(p.url)), [photos])
+
+  const set = (key) => (e) => {
+    const raw = e.target.value
+    setValues((v) => ({ ...v, [key]: key === 'phone' ? formatPhone(raw) : raw }))
+    if (error?.field === key) setError(null)
+  }
+
+  const addFiles = (list) => {
+    const next = [...list]
+      .filter((f) => f.type.startsWith('image/'))
+      .slice(0, 6 - photos.length)
+      .map((f) => ({ id: `${f.name}-${f.size}-${Math.random()}`, name: f.name, url: URL.createObjectURL(f) }))
+    if (!next.length) return
+    setPhotos((p) => [...p, ...next])
+  }
+
+  const removePhoto = (id) =>
+    setPhotos((p) => {
+      const hit = p.find((x) => x.id === id)
+      if (hit) URL.revokeObjectURL(hit.url)
+      return p.filter((x) => x.id !== id)
+    })
+
+  const onSubmit = async (e) => {
+    e.preventDefault()
+    setBusy(true)
+    setError(null)
+    try {
+      const res = await submitQuote({ ...values, photoCount: photos.length })
+      setDone(res.reference)
+      toast(`Quote request sent. Reference ${res.reference}.`)
+    } catch (err) {
+      setError({ message: err.message, field: err.field })
+      toast(err.message, 'error')
+      if (err.field) document.getElementById(`q-${err.field}`)?.focus()
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const reset = () => {
+    photos.forEach((p) => URL.revokeObjectURL(p.url))
+    setPhotos([])
+    setValues(EMPTY)
+    setDone(null)
+  }
+
+  return (
+    <section className="s-lowest py-section" id="quote">
+      <div className="mx-auto max-w-container px-gutter">
+        <SectionHead
+          eyebrow="Estimate"
+          lead="Send photos of the damage and a technician replies with a fixed price, usually within two hours."
+          title="Get a price."
+        />
+
+        <div ref={ref} className="reveal mt-12">
+          {done ? (
+            <div className="card flex flex-col items-center px-6 py-16 text-center">
+              <span
+                className="flex h-14 w-14 items-center justify-center rounded-full"
+                style={{ background: 'color-mix(in srgb, var(--primary-container) 18%, transparent)', color: 'var(--primary)' }}
+              >
+                <Icon name="check" size={26} strokeWidth={2.2} />
+              </span>
+              <h3 className="t-h2 c-on mt-6">Request sent.</h3>
+              <p className="t-body c-variant mt-3 max-w-md">
+                A technician is reviewing your photos. Keep this reference — it also works in the
+                repair tracker.
+              </p>
+              <p className="t-mono c-primary mt-6 text-[24px] tracking-[0.15em]">{done}</p>
+              <button className="btn btn-ghost mt-8 px-6 py-3" onClick={reset} type="button">
+                Send another
+              </button>
+            </div>
+          ) : (
+            <form className="grid gap-6 md:grid-cols-12" noValidate onSubmit={onSubmit}>
+              <div className="flex flex-col gap-5 md:col-span-7">
+                <div className="grid gap-5 sm:grid-cols-2">
+                  <Field error={error} id="q-name" label="Full name">
+                    <input
+                      className="field"
+                      id="q-name"
+                      aria-invalid={error?.field === 'name'}
+                      onChange={set('name')}
+                      placeholder="Jordan Mills"
+                      value={values.name}
+                    />
+                  </Field>
+                  <Field error={error} id="q-email" label="Email">
+                    <input
+                      className="field"
+                      id="q-email"
+                      aria-invalid={error?.field === 'email'}
+                      onChange={set('email')}
+                      placeholder="jordan@example.com"
+                      type="email"
+                      value={values.email}
+                    />
+                  </Field>
+                  <Field error={error} id="q-phone" label="Phone">
+                    <input
+                      className="field"
+                      id="q-phone"
+                      aria-invalid={error?.field === 'phone'}
+                      inputMode="tel"
+                      onChange={set('phone')}
+                      placeholder="(416) 000-0000"
+                      value={values.phone}
+                    />
+                  </Field>
+                  <Field error={error} id="q-vehicle" label="Vehicle">
+                    <input
+                      className="field"
+                      id="q-vehicle"
+                      aria-invalid={error?.field === 'vehicle'}
+                      onChange={set('vehicle')}
+                      placeholder="2021 Tesla Model 3"
+                      value={values.vehicle}
+                    />
+                  </Field>
+                </div>
+
+                <Field error={error} id="q-service" label="Service">
+                  <select
+                    className="field"
+                    id="q-service"
+                    aria-invalid={error?.field === 'service'}
+                    onChange={set('service')}
+                    value={values.service}
+                  >
+                    <option value="">Choose the closest match</option>
+                    {SERVICES.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.name}
+                      </option>
+                    ))}
+                    <option value="other">Something else</option>
+                  </select>
+                </Field>
+
+                <Field error={error} id="q-description" label="What happened">
+                  <textarea
+                    className="field min-h-[130px] resize-y"
+                    id="q-description"
+                    aria-invalid={error?.field === 'description'}
+                    onChange={set('description')}
+                    placeholder="Where the damage is, roughly how big, and whether it catches a fingernail."
+                    value={values.description}
+                  />
+                </Field>
+              </div>
+
+              <div className="flex flex-col gap-5 md:col-span-5">
+                <div className="flex flex-1 flex-col gap-2">
+                  <span className="t-caps c-variant">Photos · {photos.length}/6</span>
+
+                  <div
+                    className="relative flex flex-1 flex-col items-center justify-center rounded p-8 text-center transition-colors"
+                    onDragLeave={() => setDragging(false)}
+                    onDragOver={(e) => {
+                      e.preventDefault()
+                      setDragging(true)
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault()
+                      setDragging(false)
+                      addFiles(e.dataTransfer.files)
+                    }}
+                    style={{
+                      border: `1px dashed ${
+                        dragging
+                          ? 'var(--primary-container)'
+                          : 'color-mix(in srgb, var(--outline-variant) 40%, transparent)'
+                      }`,
+                      background: dragging
+                        ? 'color-mix(in srgb, var(--primary-container) 7%, transparent)'
+                        : 'var(--surface-container-lowest)',
+                      minHeight: 190,
+                    }}
+                  >
+                    <input
+                      accept="image/*"
+                      className="absolute inset-0 cursor-pointer opacity-0"
+                      multiple
+                      onChange={(e) => {
+                        addFiles(e.target.files)
+                        e.target.value = ''
+                      }}
+                      ref={fileInput}
+                      type="file"
+                    />
+                    <span className="c-primary">
+                      <Icon name="upload" size={26} />
+                    </span>
+                    <p className="c-on mt-4 text-[15px]">Drop photos here</p>
+                    <p className="c-variant mt-1 text-[13px] opacity-70">or click to browse</p>
+                    <p className="t-caps c-variant mt-4 text-[9px] opacity-45">
+                      Daylight, straight on, one close-up
+                    </p>
+                  </div>
+
+                  {photos.length > 0 && (
+                    <ul className="grid grid-cols-4 gap-2">
+                      {photos.map((p) => (
+                        <li key={p.id} className="group relative aspect-square overflow-hidden rounded">
+                          <img alt={p.name} className="h-full w-full object-cover" src={p.url} />
+                          <button
+                            aria-label={`Remove ${p.name}`}
+                            className="absolute inset-0 flex items-center justify-center bg-black/65 opacity-0 transition-opacity group-hover:opacity-100 focus:opacity-100"
+                            onClick={() => removePhoto(p.id)}
+                            type="button"
+                          >
+                            <Icon name="close" size={16} />
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+
+                {error && !error.field && (
+                  <p className="t-body text-[14px]" style={{ color: 'var(--error)' }} role="alert">
+                    {error.message}
+                  </p>
+                )}
+
+                <button className="btn btn-primary w-full py-4" disabled={busy} type="submit">
+                  {busy ? <Spinner /> : <Icon name="send" size={15} />}
+                  {busy ? 'Sending' : 'Send request'}
+                </button>
+                <p className="t-caps c-variant text-center text-[9px] opacity-45">
+                  No obligation · No card required
+                </p>
+              </div>
+            </form>
+          )}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function Field({ id, label, error, children }) {
+  const invalid = error?.field === id.replace('q-', '')
+  return (
+    <div className="flex flex-col gap-2">
+      <label className="t-caps c-variant" htmlFor={id}>
+        {label}
+      </label>
+      {children}
+      {invalid && (
+        <span className="text-[13px]" role="alert" style={{ color: 'var(--error)' }}>
+          {error.message}
+        </span>
+      )}
+    </div>
+  )
+}
+
+/* ===== src/components/BookingModal.jsx ===== */
+const STEPS = [
+  { id: 'service', label: 'Service' },
+  { id: 'vehicle', label: 'Vehicle' },
+  { id: 'schedule', label: 'Schedule' },
+  { id: 'contact', label: 'Contact' },
+]
+
+const BLANK = {
+  service: '',
+  vehicle: '',
+  colour: '',
+  notes: '',
+  date: '',
+  time: '',
+  name: '',
+  email: '',
+  phone: '',
+  address: '',
+}
+
+/** Next 14 days, starting tomorrow — nothing is bookable same-day. */
+function upcomingDays() {
+  const out = []
+  const start = new Date()
+  start.setHours(12, 0, 0, 0)
+  for (let i = 1; i <= 14; i++) {
+    const d = new Date(start)
+    d.setDate(start.getDate() + i)
+    out.push({
+      iso: d.toISOString().slice(0, 10),
+      weekday: d.toLocaleDateString('en-CA', { weekday: 'short' }).toUpperCase(),
+      day: d.getDate(),
+      month: d.toLocaleDateString('en-CA', { month: 'short' }).toUpperCase(),
+      closed: d.getDay() === 0,
+      label: d.toLocaleDateString('en-CA', { weekday: 'short', day: 'numeric', month: 'short' }),
+    })
+  }
+  return out
+}
+
+function BookingModal({ open, onClose, presetService }) {
+  const toast = useToast()
+  const [step, setStep] = useState(0)
+  const [values, setValues] = useState(BLANK)
+  const [slots, setSlots] = useState(null)
+  const [loadingSlots, setLoadingSlots] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState(null)
+  const [confirmed, setConfirmed] = useState(null)
+
+  const days = useMemo(upcomingDays, [])
+
+  // Reset when the dialog reopens, honouring a service chosen from a card.
+  useEffect(() => {
+    if (!open) return
+    setValues({ ...BLANK, service: presetService || '' })
+    setStep(presetService ? 1 : 0)
+    setConfirmed(null)
+    setError(null)
+    setSlots(null)
+  }, [open, presetService])
+
+  useEffect(() => {
+    if (!values.date) return
+    let cancelled = false
+    setLoadingSlots(true)
+    setSlots(null)
+    getAvailability(values.date)
+      .then((s) => !cancelled && setSlots(s))
+      .catch(() => !cancelled && setSlots([]))
+      .finally(() => !cancelled && setLoadingSlots(false))
+    return () => {
+      cancelled = true
+    }
+  }, [values.date])
+
+  const set = (key, value) => {
+    setValues((v) => ({ ...v, [key]: key === 'phone' ? formatPhone(value) : value }))
+    setError(null)
+  }
+
+  const canAdvance = {
+    0: !!values.service,
+    1: values.vehicle.trim().length > 1,
+    2: !!values.date && !!values.time,
+    3: values.name.trim() && values.email.trim() && values.phone.trim() && values.address.trim(),
+  }[step]
+
+  const submit = async () => {
+    setBusy(true)
+    setError(null)
+    try {
+      const booking = await createBooking(values)
+      setConfirmed(booking)
+      toast(`Booked. Reference ${booking.reference}.`)
+    } catch (err) {
+      setError(err.message)
+      toast(err.message, 'error')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const service = SERVICES.find((s) => s.id === values.service)
+  const chosenDay = days.find((d) => d.iso === values.date)
+
+  return (
+    <Modal label="Book a repair" onClose={onClose} open={open} width="max-w-4xl">
+      {confirmed ? (
+        <Confirmation booking={confirmed} day={chosenDay} onClose={onClose} service={service} />
+      ) : (
+        <>
+          <Stepper current={step} onJump={(i) => i < step && setStep(i)} />
+
+          <div className="flex-1 overflow-y-auto px-6 py-7 sm:px-8">
+            {step === 0 && <StepService onPick={(id) => { set('service', id); setStep(1) }} value={values.service} />}
+            {step === 1 && <StepVehicle set={set} values={values} />}
+            {step === 2 && (
+              <StepSchedule
+                days={days}
+                loading={loadingSlots}
+                set={set}
+                slots={slots}
+                values={values}
+              />
+            )}
+            {step === 3 && <StepContact error={error} set={set} values={values} />}
+          </div>
+
+          <div className="s-lowest hairline-t flex items-center justify-between gap-4 px-6 py-4 sm:px-8">
+            <button
+              className="btn btn-quiet px-2 py-3"
+              onClick={() => (step === 0 ? onClose() : setStep((s) => s - 1))}
+              type="button"
+            >
+              <Icon name="arrowLeft" size={14} />
+              {step === 0 ? 'Cancel' : 'Back'}
+            </button>
+
+            <div className="flex items-center gap-4">
+              <Summary service={service} values={values} />
+              {step < 3 ? (
+                <button
+                  className="btn btn-primary px-6 py-3"
+                  disabled={!canAdvance}
+                  onClick={() => setStep((s) => s + 1)}
+                  type="button"
+                >
+                  Continue
+                  <Icon name="arrowRight" size={14} />
+                </button>
+              ) : (
+                <button
+                  className="btn btn-primary px-6 py-3"
+                  disabled={!canAdvance || busy}
+                  onClick={submit}
+                  type="button"
+                >
+                  {busy ? <Spinner /> : null}
+                  {busy ? 'Booking' : 'Confirm booking'}
+                </button>
+              )}
+            </div>
+          </div>
+        </>
+      )}
+    </Modal>
+  )
+}
+
+/* --- Stepper -------------------------------------------------------------- */
+
+function Stepper({ current, onJump }) {
+  return (
+    <div className="s-lowest hairline-b px-6 pb-5 pt-6 sm:px-8">
+      <div className="flex items-center gap-2 sm:gap-3">
+        {STEPS.map((s, i) => {
+          const state = i < current ? 'done' : i === current ? 'current' : 'todo'
+          return (
+            <div key={s.id} className="flex flex-1 items-center gap-2 sm:gap-3">
+              <button
+                className="flex items-center gap-2 whitespace-nowrap"
+                disabled={i >= current}
+                onClick={() => onJump(i)}
+                type="button"
+              >
+                <span
+                  className="t-mono flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-bold"
+                  style={{
+                    background: state === 'current' ? 'var(--primary-container)' : 'transparent',
+                    color:
+                      state === 'current'
+                        ? '#fff'
+                        : state === 'done'
+                          ? 'var(--primary)'
+                          : 'color-mix(in srgb, var(--on-surface-variant) 45%, transparent)',
+                    border:
+                      state === 'current'
+                        ? '1px solid var(--primary-container)'
+                        : `1px solid color-mix(in srgb, var(--secondary) ${state === 'done' ? 45 : 22}%, transparent)`,
+                  }}
+                >
+                  {state === 'done' ? <Icon name="check" size={11} strokeWidth={3} /> : String(i + 1).padStart(2, '0')}
+                </span>
+                <span
+                  className="t-caps hidden text-[10px] sm:inline"
+                  style={{
+                    color:
+                      state === 'todo'
+                        ? 'color-mix(in srgb, var(--on-surface-variant) 45%, transparent)'
+                        : 'var(--on-surface)',
+                  }}
+                >
+                  {s.label}
+                </span>
+              </button>
+              {i < STEPS.length - 1 && (
+                <span
+                  className="h-px flex-1"
+                  style={{
+                    background:
+                      i < current
+                        ? 'color-mix(in srgb, var(--primary) 45%, transparent)'
+                        : 'color-mix(in srgb, var(--secondary) 20%, transparent)',
+                    transition: 'background .3s ease',
+                  }}
+                />
+              )}
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+/* --- Steps ---------------------------------------------------------------- */
+
+function StepService({ value, onPick }) {
+  return (
+    <fieldset>
+      <legend className="t-h2 c-on">What needs work?</legend>
+      <p className="t-body c-variant mt-2">Not sure? Pick the closest and add a note on the next screen.</p>
+      <div className="mt-6 grid gap-3 sm:grid-cols-3">
+        {SERVICES.map((s) => {
+          const selected = value === s.id
+          return (
+            <button
+              key={s.id}
+              className="card flex flex-col items-start p-5 text-left transition-all"
+              onClick={() => onPick(s.id)}
+              style={{
+                borderColor: selected
+                  ? 'var(--primary-container)'
+                  : 'color-mix(in srgb, var(--outline-variant) 22%, transparent)',
+                background: selected
+                  ? 'color-mix(in srgb, var(--primary-container) 8%, var(--surface))'
+                  : 'var(--surface)',
+              }}
+              type="button"
+            >
+              <span className="c-primary">
+                <Icon name={s.icon} size={22} />
+              </span>
+              <span className="t-h3 c-on mt-4 text-[16px]">{s.name}</span>
+              <span className="t-mono c-variant mt-2 text-[12px]">{s.price}</span>
+              <span className="chip mt-4">{s.est}</span>
+            </button>
+          )
+        })}
+      </div>
+    </fieldset>
+  )
+}
+
+function StepVehicle({ values, set }) {
+  return (
+    <div>
+      <h3 className="t-h2 c-on">Tell us about the car.</h3>
+      <p className="t-body c-variant mt-2">
+        The paint code is on the door jamb sticker. If you can’t find it, leave it blank — the tech
+        will scan it on arrival.
+      </p>
+      <div className="mt-6 grid gap-5 sm:grid-cols-2">
+        <Labelled label="Make and model">
+          <input
+            autoFocus
+            className="field"
+            onChange={(e) => set('vehicle', e.target.value)}
+            placeholder="2021 Tesla Model 3"
+            value={values.vehicle}
+          />
+        </Labelled>
+        <Labelled label="Paint code (optional)">
+          <input
+            className="field t-mono"
+            onChange={(e) => set('colour', e.target.value)}
+            placeholder="PPSW"
+            value={values.colour}
+          />
+        </Labelled>
+      </div>
+      <Labelled className="mt-5" label="Damage notes (optional)">
+        <textarea
+          className="field min-h-[110px] resize-y"
+          onChange={(e) => set('notes', e.target.value)}
+          placeholder="Rear passenger door, about 15 cm, catches a fingernail."
+          value={values.notes}
+        />
+      </Labelled>
+    </div>
+  )
+}
+
+function StepSchedule({ days, values, set, slots, loading }) {
+  return (
+    <div>
+      <h3 className="t-h2 c-on">Pick a window.</h3>
+      <p className="t-body c-variant mt-2">
+        Each slot is a two-hour arrival window. You’ll get a live ETA by text on the day.
+      </p>
+
+      <div className="no-scrollbar -mx-1 mt-6 flex gap-2 overflow-x-auto px-1 pb-2">
+        {days.map((d) => {
+          const selected = values.date === d.iso
+          return (
+            <button
+              key={d.iso}
+              className="card flex w-[68px] shrink-0 flex-col items-center py-3 transition-all"
+              disabled={d.closed}
+              onClick={() => {
+                set('date', d.iso)
+                set('time', '')
+              }}
+              style={{
+                borderColor: selected
+                  ? 'var(--primary-container)'
+                  : 'color-mix(in srgb, var(--outline-variant) 22%, transparent)',
+                background: selected ? 'color-mix(in srgb, var(--primary-container) 12%, var(--surface))' : 'var(--surface)',
+                opacity: d.closed ? 0.32 : 1,
+              }}
+              type="button"
+            >
+              <span className="t-caps text-[9px]" style={{ color: selected ? 'var(--primary)' : 'var(--on-surface-variant)' }}>
+                {d.weekday}
+              </span>
+              <span className="t-mono c-on mt-1.5 text-[18px] font-bold leading-none">{d.day}</span>
+              <span className="t-caps c-variant mt-1.5 text-[8px] opacity-55">{d.month}</span>
+            </button>
+          )
+        })}
+      </div>
+
+      <div className="mt-7 min-h-[120px]">
+        {!values.date && (
+          <p className="t-caps c-variant flex items-center gap-2 opacity-50">
+            <Icon name="calendar" size={14} />
+            Choose a date to see open windows
+          </p>
+        )}
+
+        {loading && (
+          <div className="flex items-center gap-3">
+            <span className="c-primary">
+              <Spinner size={15} />
+            </span>
+            <span className="t-caps c-variant">Checking the dispatch board</span>
+          </div>
+        )}
+
+        {slots && !loading && (
+          <>
+            <span className="t-caps c-variant">Arrival window</span>
+            <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-5">
+              {slots.map((s) => {
+                const selected = values.time === s.time
+                return (
+                  <button
+                    key={s.time}
+                    className="card t-mono py-3 text-[13px] transition-all"
+                    disabled={!s.available}
+                    onClick={() => set('time', s.time)}
+                    style={{
+                      borderColor: selected
+                        ? 'var(--primary-container)'
+                        : 'color-mix(in srgb, var(--outline-variant) 22%, transparent)',
+                      background: selected
+                        ? 'var(--primary-container)'
+                        : 'var(--surface)',
+                      color: selected ? '#fff' : s.available ? 'var(--on-surface)' : 'var(--on-surface-variant)',
+                      opacity: s.available ? 1 : 0.3,
+                      textDecoration: s.available ? 'none' : 'line-through',
+                    }}
+                    type="button"
+                  >
+                    {s.time}
+                  </button>
+                )
+              })}
+            </div>
+            {slots.every((s) => !s.available) && (
+              <p className="t-body c-variant mt-4 text-[14px]">
+                That day is fully booked. Try another date, or call and we’ll find room.
+              </p>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function StepContact({ values, set, error }) {
+  return (
+    <div>
+      <h3 className="t-h2 c-on">Where should we meet you?</h3>
+      <p className="t-body c-variant mt-2">
+        The unit needs a flat spot and about three metres of clearance around the panel.
+      </p>
+      <div className="mt-6 grid gap-5 sm:grid-cols-2">
+        <Labelled label="Name">
+          <input autoFocus className="field" onChange={(e) => set('name', e.target.value)} value={values.name} placeholder="Jordan Mills" />
+        </Labelled>
+        <Labelled label="Email">
+          <input className="field" onChange={(e) => set('email', e.target.value)} placeholder="jordan@example.com" type="email" value={values.email} />
+        </Labelled>
+        <Labelled label="Phone">
+          <input className="field" inputMode="tel" onChange={(e) => set('phone', e.target.value)} placeholder="(416) 000-0000" value={values.phone} />
+        </Labelled>
+        <Labelled label="Address">
+          <input className="field" onChange={(e) => set('address', e.target.value)} placeholder="Street, city" value={values.address} />
+        </Labelled>
+      </div>
+      {error && (
+        <p className="mt-5 text-[14px]" role="alert" style={{ color: 'var(--error)' }}>
+          {error}
+        </p>
+      )}
+    </div>
+  )
+}
+
+/* --- Confirmation --------------------------------------------------------- */
+
+function Confirmation({ booking, service, day, onClose }) {
+  const rows = [
+    ['Service', service?.name || booking.service],
+    ['Vehicle', booking.vehicle],
+    ['When', `${day?.label || booking.date} · ${booking.window}`],
+    ['Where', booking.address],
+    ['Technician', booking.tech],
+  ]
+  return (
+    <div className="px-6 py-12 text-center sm:px-10">
+      <span
+        className="mx-auto flex h-14 w-14 items-center justify-center rounded-full"
+        style={{ background: 'color-mix(in srgb, var(--primary-container) 18%, transparent)', color: 'var(--primary)' }}
+      >
+        <Icon name="check" size={26} strokeWidth={2.2} />
+      </span>
+      <h3 className="t-h1 c-on mt-6">You’re booked.</h3>
+      <p className="t-body c-variant mx-auto mt-3 max-w-md">
+        A confirmation is on its way to {booking.email}. Track progress any time with this reference.
+      </p>
+
+      <p className="t-mono c-primary mt-7 text-[28px] tracking-[0.16em]">{booking.reference}</p>
+
+      <dl className="card mx-auto mt-8 max-w-md divide-y overflow-hidden text-left">
+        {rows.map(([k, v]) => (
+          <div key={k} className="flex items-baseline justify-between gap-6 px-5 py-3.5">
+            <dt className="t-caps c-variant text-[10px]">{k}</dt>
+            <dd className="c-on text-right text-[14px]">{v}</dd>
+          </div>
+        ))}
+      </dl>
+
+      <button className="btn btn-primary mt-9 px-8 py-4" onClick={onClose} type="button">
+        Done
+      </button>
+    </div>
+  )
+}
+
+/* --- Bits ----------------------------------------------------------------- */
+
+function Labelled({ label, children, className = '' }) {
+  return (
+    <label className={`flex flex-col gap-2 ${className}`}>
+      <span className="t-caps c-variant">{label}</span>
+      {children}
+    </label>
+  )
+}
+
+function Summary({ service, values }) {
+  if (!service) return null
+  return (
+    <span className="t-mono c-variant hidden text-[11px] opacity-60 md:inline">
+      {service.name}
+      {values.time ? ` · ${values.time}` : ''}
+    </span>
+  )
+}
+
+/* ===== src/components/TrackModal.jsx ===== */
+function TrackModal({ open, onClose }) {
+  const [reference, setReference] = useState('')
+  const [job, setJob] = useState(null)
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState(null)
+
+  const lookup = async (e) => {
+    e?.preventDefault()
+    setBusy(true)
+    setError(null)
+    setJob(null)
+    try {
+      setJob(await getRepair(reference))
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const reset = () => {
+    setJob(null)
+    setError(null)
+    setReference('')
+  }
+
+  return (
+    <Modal label="Track a repair" onClose={onClose} open={open} width="max-w-2xl">
+      <div className="px-6 py-9 sm:px-9">
+        <h2 className="t-h1 c-on">Track a repair.</h2>
+        <p className="t-body c-variant mt-3">
+          Enter the reference from your confirmation email.
+        </p>
+
+        <form className="mt-6 flex flex-col gap-3 sm:flex-row" onSubmit={lookup}>
+          <input
+            aria-invalid={!!error}
+            aria-label="Repair reference"
+            className="field t-mono flex-1 uppercase tracking-[0.14em]"
+            onChange={(e) => {
+              setReference(e.target.value)
+              setError(null)
+            }}
+            placeholder="PF-0000"
+            value={reference}
+          />
+          <button className="btn btn-primary px-6 py-3" disabled={busy || !reference.trim()} type="submit">
+            {busy ? <Spinner /> : <Icon name="search" size={14} />}
+            {busy ? 'Looking' : 'Find job'}
+          </button>
+        </form>
+
+        {error && (
+          <p className="mt-4 text-[14px]" role="alert" style={{ color: 'var(--error)' }}>
+            {error}
+          </p>
+        )}
+
+        {!job && !busy && (
+          <p className="t-caps c-variant mt-6 text-[10px] opacity-45">
+            Demo references · PF-2481 · PF-7752 · PF-1039
+          </p>
+        )}
+
+        {job && <Timeline job={job} onReset={reset} />}
+      </div>
+    </Modal>
+  )
+}
+
+function Timeline({ job, onReset }) {
+  return (
+    <div className="mt-9" style={{ animation: 'track-in .35s cubic-bezier(.2,.7,.3,1) both' }}>
+      <div className="card flex flex-wrap items-center justify-between gap-4 p-5">
+        <div>
+          <span className="t-mono c-primary text-[18px] tracking-[0.14em]">{job.reference}</span>
+          <p className="c-on mt-1.5 text-[15px]">{job.vehicle}</p>
+          <p className="t-caps c-variant mt-2 text-[9px] opacity-60">{job.colour}</p>
+        </div>
+        <div className="text-right">
+          <span className="chip">{job.service}</span>
+          <p className="t-mono c-variant mt-2.5 text-[11px]">
+            {job.date} · {job.window}
+          </p>
+          <p className="t-caps c-variant mt-1.5 text-[9px] opacity-60">TECH · {job.tech}</p>
+        </div>
+      </div>
+
+      <ol className="mt-7">
+        {job.stages.map((stage, i) => {
+          const state = i < job.stageIndex ? 'done' : i === job.stageIndex ? 'current' : 'todo'
+          const last = i === job.stages.length - 1
+          return (
+            <li key={stage.id} className="relative flex gap-4 pb-7 last:pb-0">
+              {!last && (
+                <span
+                  className="absolute left-[11px] top-6 w-px"
+                  style={{
+                    bottom: 6,
+                    background:
+                      state === 'done'
+                        ? 'color-mix(in srgb, var(--primary) 45%, transparent)'
+                        : 'color-mix(in srgb, var(--secondary) 20%, transparent)',
+                  }}
+                />
+              )}
+
+              <span
+                className="relative z-10 mt-0.5 flex h-[23px] w-[23px] shrink-0 items-center justify-center rounded-full"
+                style={{
+                  background: state === 'current' ? 'var(--primary-container)' : 'var(--surface-container)',
+                  border:
+                    state === 'todo'
+                      ? '1px solid color-mix(in srgb, var(--secondary) 22%, transparent)'
+                      : `1px solid ${state === 'current' ? 'var(--primary-container)' : 'color-mix(in srgb, var(--primary) 45%, transparent)'}`,
+                  color: state === 'current' ? '#fff' : 'var(--primary)',
+                }}
+              >
+                {state === 'done' && <Icon name="check" size={11} strokeWidth={3} />}
+                {state === 'current' && (
+                  <span
+                    className="h-1.5 w-1.5 rounded-full bg-white"
+                    style={{ animation: 'pulse 1.8s ease-in-out infinite' }}
+                  />
+                )}
+              </span>
+
+              <div className="flex-1 pt-px">
+                <div className="flex flex-wrap items-center gap-3">
+                  <span
+                    className="t-caps text-[10px]"
+                    style={{
+                      color:
+                        state === 'todo'
+                          ? 'color-mix(in srgb, var(--on-surface-variant) 45%, transparent)'
+                          : state === 'current'
+                            ? 'var(--primary)'
+                            : 'var(--on-surface)',
+                    }}
+                  >
+                    {stage.label}
+                  </span>
+                  {state === 'current' && <span className="chip">IN PROGRESS</span>}
+                </div>
+                <p
+                  className="mt-2 text-[14px] leading-relaxed"
+                  style={{
+                    color:
+                      state === 'todo'
+                        ? 'color-mix(in srgb, var(--on-surface-variant) 40%, transparent)'
+                        : 'var(--on-surface-variant)',
+                  }}
+                >
+                  {stage.note}
+                </p>
+              </div>
+            </li>
+          )
+        })}
+      </ol>
+
+      <button className="btn btn-ghost mt-8 w-full py-3" onClick={onReset} type="button">
+        Look up another
+      </button>
+
+      <style>{`
+        @keyframes track-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+        @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.75)}}
+      `}</style>
+    </div>
+  )
+}
+
+/* ===== src/components/Footer.jsx ===== */
+function Footer({ onTrack }) {
+  return (
+    <footer className="s-lowest hairline-t py-16">
+      <div className="mx-auto max-w-container px-gutter">
+        <div className="grid gap-10 md:grid-cols-12">
+          <div className="md:col-span-5">
+            <span className="t-h2 c-on">
+              Paint Force<span className="c-primary">.</span>
+            </span>
+            <p className="t-body c-variant mt-4 max-w-sm">
+              Mobile paint and scratch repair across the western GTA. Same finish as a body shop,
+              without leaving your driveway.
+            </p>
+            <button className="btn btn-ghost mt-6 px-5 py-3" onClick={onTrack} type="button">
+              <Icon name="search" size={14} />
+              Track a repair
+            </button>
+          </div>
+
+          <div className="md:col-span-3">
+            <span className="t-caps c-variant opacity-55">Contact</span>
+            <ul className="mt-4 flex flex-col gap-3">
+              <li>
+                <a className="c-on flex items-center gap-2 text-[15px] transition-colors hover:opacity-75" href={PHONE_HREF}>
+                  <span className="c-primary">
+                    <Icon name="phone" size={15} />
+                  </span>
+                  {PHONE}
+                </a>
+              </li>
+              <li className="c-variant flex items-start gap-2 text-[15px]">
+                <span className="c-primary mt-0.5">
+                  <Icon name="pin" size={15} />
+                </span>
+                {ADDRESS}
+              </li>
+            </ul>
+          </div>
+
+          <div className="md:col-span-4 md:text-right">
+            <span className="t-caps c-variant opacity-55">Hours</span>
+            <dl className="mt-4 flex flex-col gap-2">
+              {[
+                ['MON – FRI', '07:00 – 18:00'],
+                ['SATURDAY', '08:00 – 16:00'],
+                ['SUNDAY', 'CLOSED'],
+              ].map(([d, h]) => (
+                <div key={d} className="flex justify-between gap-6 md:justify-end">
+                  <dt className="t-caps c-variant text-[10px] opacity-60">{d}</dt>
+                  <dd className="t-mono c-on w-[110px] text-[12px] md:text-right">{h}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </div>
+
+        <div className="hairline-t mt-12 flex flex-col gap-4 pt-7 sm:flex-row sm:items-center sm:justify-between">
+          <p className="t-caps c-variant text-[9px] opacity-45">
+            © {new Date().getFullYear()} Paint Force, Inc. · Lifetime workmanship warranty
+          </p>
+          <div className="flex gap-6">
+            <a className="t-caps c-variant text-[9px] opacity-45 transition-opacity hover:opacity-90" href="#">
+              Terms
+            </a>
+            <a className="t-caps c-variant text-[9px] opacity-45 transition-opacity hover:opacity-90" href="#">
+              Privacy
+            </a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  )
+}
+
+/* ===== src/App.jsx ===== */
+function App() {
+  return (
+    <ToastProvider>
+      <Site />
+    </ToastProvider>
+  )
+}
+
+function Site() {
+  const [booking, setBooking] = useState(false)
+  const [tracking, setTracking] = useState(false)
+  const [preset, setPreset] = useState('')
+
+  const openBooking = useCallback((serviceId = '') => {
+    setPreset(serviceId || '')
+    setBooking(true)
+  }, [])
+
+  return (
+    <>
+      <Nav onBook={() => openBooking()} onTrack={() => setTracking(true)} />
+
+      <main id="main">
+        <Hero onBook={() => openBooking()} />
+        <Services onBook={openBooking} />
+        <Process onBook={openBooking} />
+        <Portfolio />
+        <Reviews />
+        <CTA onBook={openBooking} />
+        <QuoteForm />
+      </main>
+
+      <Footer onTrack={() => setTracking(true)} />
+
+      <BookingBar onBook={() => openBooking()} />
+
+      <BookingModal onClose={() => setBooking(false)} open={booking} presetService={preset} />
+      <TrackModal onClose={() => setTracking(false)} open={tracking} />
+    </>
+  )
+}
+
+/** The brief asks for a pinned booking widget. On phones it earns its keep as a
+ *  bottom bar; on desktop the header CTA is always visible, so it stays out. */
+function BookingBar({ onBook }) {
+  const shown = useScrolled(560)
+  return (
+    <div
+      className="fixed inset-x-0 bottom-0 z-[70] px-3 pb-3 sm:hidden"
+      style={{
+        transform: shown ? 'none' : 'translateY(120%)',
+        transition: 'transform .35s cubic-bezier(.2,.7,.3,1)',
+        pointerEvents: shown ? 'auto' : 'none',
+      }}
+    >
+      <div
+        className="hairline flex items-center gap-2 rounded p-2"
+        style={{
+          background: 'rgba(28,32,36,.92)',
+          backdropFilter: 'blur(14px)',
+          boxShadow: '0 -8px 30px -12px #000',
+        }}
+      >
+        <a className="btn btn-ghost flex-1 py-3.5" href={PHONE_HREF}>
+          <Icon name="phone" size={14} />
+          Call
+        </a>
+        <button className="btn btn-primary flex-[1.4] py-3.5" onClick={onBook} type="button">
+          Book a repair
+        </button>
+      </div>
+    </div>
+  )
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />)
+</script>
+</body>
+</html>
