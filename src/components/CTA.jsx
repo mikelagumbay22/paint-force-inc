@@ -22,7 +22,7 @@ export function CTA({ onBook }) {
           Pick a two-hour window and a technician comes to you. Most jobs are quoted the same day.
         </p>
         <div className="mt-9 flex flex-col items-center gap-5 sm:flex-row">
-          <button className="btn btn-primary px-9 py-4" onClick={() => onBook()} type="button">
+          <button className="btn btn-primary px-9 py-4" onClick={() => onBook()} type="button" disabled>
             Choose a time
             <Icon name="arrowRight" size={15} />
           </button>

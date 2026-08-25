@@ -183,6 +183,24 @@ export async function submitQuote(payload) {
   return { reference }
 }
 
+/* --- Franchise inquiries --------------------------------------------------
+   Kept separate from `bookings`: a franchise lead is a different kind of
+   record and should never be resolvable through the repair tracker. */
+
+let franchiseCounter = 500
+const nextFranchiseReference = () => `FR-${++franchiseCounter}`
+
+export async function submitFranchiseInquiry(payload) {
+  await transport()
+  if (!payload.name?.trim()) throw new ApiError('Add your name so we know who to reply to.', 'name')
+  if (!isEmail(payload.email)) throw new ApiError('That email address looks incomplete.', 'email')
+  if (digits(payload.phone).length < 10) throw new ApiError('Add a 10-digit phone number.', 'phone')
+  if (!payload.territory) throw new ApiError('Pick the territory closest to you.', 'territory')
+  if (!payload.readiness) throw new ApiError('Let us know your timeline.', 'readiness')
+
+  return { reference: nextFranchiseReference() }
+}
+
 /* --- Helpers ------------------------------------------------------------- */
 
 const digits = (v) => String(v || '').replace(/\D/g, '')

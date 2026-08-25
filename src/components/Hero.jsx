@@ -65,7 +65,7 @@ export function Hero({ onBook }) {
           </p>
 
           <div className="fade mt-9 flex flex-wrap items-center gap-3" style={{ animationDelay: '440ms' }}>
-            <button className="btn btn-primary px-7 py-4" onClick={onBook} type="button">
+            <button className="btn btn-primary px-7 py-4" onClick={onBook} type="button" disabled>
               Book a repair
               <Icon name="arrowRight" size={15} />
             </button>

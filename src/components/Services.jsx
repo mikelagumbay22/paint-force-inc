@@ -65,7 +65,7 @@ export function Services({ onBook }) {
                 </div>
 
                 <div className="hairline-t mt-6 flex items-center justify-between pt-5">
-                  <span className="t-mono c-on text-[13px]">{s.price}</span>
+                  <span className="t-mono c-on text-[13px]">Estimate: {s.price}</span>
                   <div className="flex items-center gap-1">
                     <button
                       aria-expanded={isOpen}

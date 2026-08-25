@@ -71,14 +71,7 @@ export const PROCESS = [
   },
 ]
 
-/**
- * Portfolio pieces.
- *
- * `composite: true` means the source file is a single side-by-side image with
- * the damaged state on the left and the finished state on the right — the
- * before/after panel crops each half rather than needing two files. When you
- * have separate photographs, drop the flag and pass `before` and `after`.
- */
+
 export const PORTFOLIO = [
   {
     id: 'p1',
@@ -146,3 +139,77 @@ export const NAV_LINKS = [
 export const PHONE = '(416) 627-3948'
 export const PHONE_HREF = 'tel:4166273948'
 export const ADDRESS = '6545 Cedar Rapids Crescent, Mississauga, ON'
+
+/* --- Franchise page -------------------------------------------------------- */
+
+export const FRANCHISE_HERO_IMAGE =
+  'https://lh3.googleusercontent.com/aida-public/AB6AXuAYrA_P43pKXA0ZwG3HaSD9Fefy1rz0UBNsXk2E4jVYruJjItNHjOEa2oU3-V_boFHsF5MVHwJQ7Vys_4c1Z4sIrj1i_FR3j5SNG3jkuc4d3qzU9gEQN6gcLR1S-KUtmYjxLD-JMBhHB7bM6sClAhhQBk-CUYht2hA1HZdknJ6fC5DLjfejPsXSRR8Rk7kuM1qcyB7s1E1kdY8kESzXvMhFB5o0I1kyG4R88WLkGVP_s5IAYwaN2WPmSQ'
+
+export const FRANCHISE_FLEET_IMAGE =
+  'https://lh3.googleusercontent.com/aida-public/AB6AXuDo1vbs1JCazbF3BmaWJ11wTqFi8Umz5EJ92YVpC-DImpjNjBjoQ5MY6zCFB9PEcZmsnxETx9Idj_yiTkvnwbsGdKRmMNvPrngL-zRhhaUQEOE0PO6kuCbzmwT_OplRkt-hUcOekMD8mXNuGPLNtkOi8AG8Eaij6Ia4FVma8Eg9npJY1edgKphX50aA3uxzw8d9gZkTOTc65X6SsUNEyG24z-m2jTLbqP_kwxAWlPIYAF3NaHNOz8evGg'
+
+export const FRANCHISE_TRAINING_IMAGE =
+  'https://lh3.googleusercontent.com/aida-public/AB6AXuCC-_qHcAEjCeCfcN--KHb82XpZn3Dz56MbxRCuLCteo7FLM9P3KFZGYkk5JPIa3sJbRB0SePFxoNroUdrAeYmSjV1ElLpKxgkljohZ0sUIl6y14QNMOj5VQ9flTA0PyJHMVowVoNmTVSXET1e7vTxS8TJ6R4nGZnDaEBCKh6yeEdGZyMG4DjojeM5MVVcCDE2M3XHU0CI1aSIys9hd5XA6w0ov0XIKpuFEwX0sVXuuVMfxOM60vIO1sQ'
+
+export const FRANCHISE_FACTS = [
+  { k: 'TERRITORY', v: 'EXCLUSIVE BY POSTAL CODE' },
+  { k: 'CERTIFICATION', v: '4-WEEK PROGRAM' },
+  { k: 'TECH STACK', v: 'DISPATCH, CRM & LIVE TRACKING' },
+  { k: 'SUPPORT', v: 'FIELD OPS LEAD FROM DAY ONE' },
+]
+
+export const FRANCHISE_ADVANTAGES = [
+  {
+    icon: 'pin',
+    title: 'Exclusive territory',
+    body: 'Mapped by postal code before you sign, so you never compete with the operator next door — or with us.',
+  },
+  {
+    icon: 'car',
+    title: 'A proven mobile format',
+    body: 'The same fitted van spec, tool list and two-hour job envelope already running daily across the western GTA.',
+  },
+  {
+    icon: 'shield',
+    title: 'One quality bar',
+    body: 'Every job is VIN-matched and photo-reviewed against the same standard, regardless of whose name is on the van.',
+  },
+]
+
+export const FRANCHISE_SUPPORT = [
+  {
+    icon: 'clock',
+    title: 'Master technician certification',
+    body: 'A 4-week hands-on program in VIN colour matching, clear-coat correction and plastic welding, taught by the technicians training new hires today.',
+  },
+  {
+    icon: 'calendar',
+    title: 'Dispatch, CRM & live tracking',
+    body: 'The exact booking, scheduling and repair-tracking system customers use on paintforce.ca, licensed with your territory — nothing to build.',
+  },
+  {
+    icon: 'search',
+    title: 'Local lead generation',
+    body: 'Paid search, review management and the quote-request flow already converting for the flagship territory, redirected to your market.',
+  },
+]
+
+export const TERRITORIES = [
+  { name: 'Mississauga, ON', status: 'active', note: 'Flagship territory, operating since 2024' },
+  { name: 'Oakville, ON', status: 'active', note: 'Served from the Mississauga hub' },
+  { name: 'Etobicoke, ON', status: 'active', note: 'Served from the Mississauga hub' },
+  { name: 'Brampton, ON', status: 'opening', note: 'Territory mapping underway' },
+  { name: 'Vaughan, ON', status: 'opening', note: 'Territory mapping underway' },
+  { name: 'Rest of the GTA', status: 'available', note: 'Open for inquiry' },
+  { name: 'Rest of Ontario', status: 'available', note: 'Open for inquiry' },
+]
+
+export const TERRITORY_OPTIONS = [
+  'Mississauga, ON',
+  'Oakville, ON',
+  'Etobicoke, ON',
+  'Brampton, ON',
+  'Vaughan, ON',
+  'Elsewhere in the GTA',
+  'Elsewhere in Ontario',
+]

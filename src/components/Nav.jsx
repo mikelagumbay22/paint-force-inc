@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { NAV_LINKS } from '../lib/data'
 import { useActiveSection, useBodyLock, useScrolled } from '../lib/hooks'
+import { Link } from '../lib/router'
 import { Icon } from './Icon'
 
 const SECTION_IDS = NAV_LINKS.map((l) => l.href.slice(1))
@@ -79,11 +80,14 @@ export function Nav({ onBook, onTrack }) {
           </div>
 
           <div className="flex items-center gap-2">
+            <Link className="btn btn-ghost hidden px-4 py-3 lg:inline-flex" to="/franchise">
+              Become a franchise
+            </Link>
             <button className="btn btn-ghost hidden px-4 py-3 sm:inline-flex" onClick={onTrack} type="button">
               <Icon name="search" size={14} />
               Track repair
             </button>
-            <button className="btn btn-primary px-5 py-3" onClick={onBook} type="button">
+            <button className="btn btn-primary px-5 py-3" onClick={onBook} type="button" disabled>
               Book now
             </button>
             <button
@@ -128,13 +132,16 @@ export function Nav({ onBook, onTrack }) {
                 {l.label}
               </a>
             ))}
+            <Link className="t-h3 c-primary hairline-b py-4" onClick={() => setOpen(false)} to="/franchise">
+              Become a franchise
+            </Link>
             <button
               className="btn btn-ghost mt-5 w-full py-4"
               onClick={() => {
                 setOpen(false)
                 onTrack()
               }}
-              type="button"
+              type="button" disabled
             >
               <Icon name="search" size={14} />
               Track a repair

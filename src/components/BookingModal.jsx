@@ -270,7 +270,7 @@ function StepService({ value, onPick }) {
                 <Icon name={s.icon} size={22} />
               </span>
               <span className="t-h3 c-on mt-4 text-[16px]">{s.name}</span>
-              <span className="t-mono c-variant mt-2 text-[12px]">{s.price}</span>
+              {/* <span className="t-mono c-variant mt-2 text-[12px]">{s.price}</span> */}
               <span className="chip mt-4">{s.est}</span>
             </button>
           )

@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { BookingModal } from './components/BookingModal'
 import { CTA } from './components/CTA'
 import { Footer } from './components/Footer'
@@ -14,13 +14,20 @@ import { ToastProvider } from './components/Toast'
 import { TrackModal } from './components/TrackModal'
 import { PHONE_HREF } from './lib/data'
 import { useScrolled } from './lib/hooks'
+import { useRoute } from './lib/router'
+import Franchise from './pages/franchise'
 
 export default function App() {
   return (
     <ToastProvider>
-      <Site />
+      <Router />
     </ToastProvider>
   )
+}
+
+function Router() {
+  const path = useRoute()
+  return path === '/franchise' ? <Franchise /> : <Site />
 }
 
 function Site() {
@@ -31,6 +38,15 @@ function Site() {
   const openBooking = useCallback((serviceId = '') => {
     setPreset(serviceId || '')
     setBooking(true)
+  }, [])
+
+  // Lets a link from another page (e.g. the franchise page's footer) land
+  // here with the tracker already open, via `/?track=1`.
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get('track') === '1') {
+      setTracking(true)
+      window.history.replaceState({}, '', '/')
+    }
   }, [])
 
   return (
@@ -57,8 +73,7 @@ function Site() {
   )
 }
 
-/** The brief asks for a pinned booking widget. On phones it earns its keep as a
- *  bottom bar; on desktop the header CTA is always visible, so it stays out. */
+
 function BookingBar({ onBook }) {
   const shown = useScrolled(560)
   return (
@@ -82,7 +97,7 @@ function BookingBar({ onBook }) {
           <Icon name="phone" size={14} />
           Call
         </a>
-        <button className="btn btn-primary flex-[1.4] py-3.5" onClick={onBook} type="button">
+        <button className="btn btn-primary flex-[1.4] py-3.5" onClick={onBook} type="button" disabled> 
           Book a repair
         </button>
       </div>

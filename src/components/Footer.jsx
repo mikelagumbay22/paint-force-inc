@@ -17,7 +17,7 @@ export function Footer({ onTrack }) {
               Mobile paint and scratch repair across the western GTA. Same finish as a body shop,
               without leaving your driveway.
             </p>
-            <button className="btn btn-ghost mt-6 px-5 py-3" onClick={onTrack} type="button">
+            <button className="btn btn-ghost mt-6 px-5 py-3" onClick={onTrack} type="button" disabled>
               <Icon name="search" size={14} />
               Track a repair
             </button>
