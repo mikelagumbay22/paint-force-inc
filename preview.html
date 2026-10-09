@@ -363,6 +363,21 @@ body {
     color: var(--on-surface);
     backdrop-filter: blur(6px);
   }
+  .chip-wrap { white-space: normal; text-align: left; line-height: 1.35; }
+
+  /* Primer shows until scroll assigns the roller wipe. */
+  .paint-wipe { clip-path: inset(0 100% 0 0); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .paint-track { height: auto !important; }
+    .paint-pin {
+      position: relative !important;
+      top: auto !important;
+      height: min(72vh, 720px) !important;
+    }
+    .paint-wipe { clip-path: none !important; }
+    .paint-layer { transform: none !important; }
+  }
 
   #main:focus { outline: none; }
 
@@ -1804,6 +1819,448 @@ function DemoBanner() {
   )
 }
 
+/* ===== src/components/HeroScrub.jsx ===== */
+const VIDEO_SRC = '/hero-video/painter-turn-720p-intra.mp4'
+const POSTER_SRC = '/hero-video/poster.jpg'
+const FRAME_COUNT = 30
+const DURATION_FALLBACK = 3
+
+const clamp = (n, a, b) => Math.min(b, Math.max(a, n))
+
+function frameSrc(index) {
+  return `/hero-video/frames/frame-${String(index + 1).padStart(3, '0')}.jpg`
+}
+
+function drawCover(ctx, img, width, height) {
+  const ir = img.naturalWidth / img.naturalHeight
+  const cr = width / height
+  let dw
+  let dh
+  let dx
+  let dy
+  if (ir > cr) {
+    dh = height
+    dw = height * ir
+    dx = (width - dw) / 2
+    dy = 0
+  } else {
+    dw = width
+    dh = width / ir
+    dx = 0
+    dy = (height - dh) / 2
+  }
+  ctx.drawImage(img, dx, dy, dw, dh)
+}
+
+/**
+ * Cursor-scrubbed hero. The clip does not autoplay: pointer X maps to
+ * currentTime through a smoothed animation frame. Touch uses scroll while
+ * the finger is moving, then a slow ping-pong. If seeking never lands,
+ * the 30 stills are drawn on a canvas instead.
+ */
+function HeroScrub() {
+  const root = useRef(null)
+  const videoRef = useRef(null)
+  const canvasRef = useRef(null)
+  const reduce = useReducedMotion()
+  const [engine, setEngine] = useState('poster')
+
+  useEffect(() => {
+    if (reduce) return undefined
+    const rootEl = root.current
+    const video = videoRef.current
+    if (!rootEl || !video) return undefined
+
+    let dead = false
+    let raf = 0
+    let target = 0
+    let shown = 0
+    let duration = DURATION_FALLBACK
+    let mode = 'video'
+    let frames = []
+    let lastIndex = -1
+    let ping = 0
+    let pingDir = 1
+    let lastTs = 0
+    let scrolling = false
+    let scrollTimer = 0
+    const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches
+
+    const resizeCanvas = () => {
+      const canvas = canvasRef.current
+      if (!canvas) return null
+      const dpr = Math.min(window.devicePixelRatio || 1, 2)
+      const width = rootEl.clientWidth
+      const height = rootEl.clientHeight
+      const nextW = Math.max(1, Math.round(width * dpr))
+      const nextH = Math.max(1, Math.round(height * dpr))
+      if (canvas.width !== nextW || canvas.height !== nextH) {
+        canvas.width = nextW
+        canvas.height = nextH
+        lastIndex = -1
+      }
+      const ctx = canvas.getContext('2d')
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+      return { ctx, width, height }
+    }
+
+    const drawFrame = (time) => {
+      if (!frames.length) return
+      const surface = resizeCanvas()
+      if (!surface) return
+      const idx = clamp(Math.round((time / duration) * (frames.length - 1)), 0, frames.length - 1)
+      let use = -1
+      if (frames[idx]?.complete && frames[idx].naturalWidth) use = idx
+      else {
+        for (let d = 1; d < frames.length; d += 1) {
+          if (frames[idx - d]?.complete && frames[idx - d].naturalWidth) {
+            use = idx - d
+            break
+          }
+          if (frames[idx + d]?.complete && frames[idx + d].naturalWidth) {
+            use = idx + d
+            break
+          }
+        }
+      }
+      if (use < 0 || use === lastIndex) return
+      lastIndex = use
+      surface.ctx.clearRect(0, 0, surface.width, surface.height)
+      drawCover(surface.ctx, frames[use], surface.width, surface.height)
+    }
+
+    const useFrames = () => {
+      if (mode === 'frames' || dead) return
+      mode = 'frames'
+      if (!frames.length) {
+        frames = Array.from({ length: FRAME_COUNT }, (_, i) => {
+          const img = new Image()
+          img.decoding = 'async'
+          img.src = frameSrc(i)
+          return img
+        })
+      }
+      try {
+        video.pause()
+        video.removeAttribute('src')
+        video.load()
+      } catch {
+        /* the stills take over */
+      }
+      setEngine('frames')
+    }
+
+    const apply = (time) => {
+      if (mode === 'frames') {
+        drawFrame(time)
+        return
+      }
+      if (Math.abs(video.currentTime - time) < 1 / 30) return
+      try {
+        video.currentTime = time
+      } catch {
+        useFrames()
+      }
+    }
+
+    const loop = (ts) => {
+      if (dead) return
+      const dt = lastTs ? Math.min(0.05, (ts - lastTs) / 1000) : 0.016
+      lastTs = ts
+      const rect = rootEl.getBoundingClientRect()
+      const near = rect.bottom > -80 && rect.top < window.innerHeight + 80
+      if (!fine && near && !scrolling) {
+        ping += pingDir * dt * 0.42
+        if (ping >= duration) {
+          ping = duration
+          pingDir = -1
+        } else if (ping <= 0) {
+          ping = 0
+          pingDir = 1
+        }
+        target = ping
+      }
+      if (near) {
+        shown += (target - shown) * 0.18
+        if (Math.abs(target - shown) < 0.012) shown = target
+        apply(shown)
+      }
+      raf = requestAnimationFrame(loop)
+    }
+
+    const onMove = (e) => {
+      if (!fine || e.pointerType === 'touch') return
+      target = clamp(e.clientX / window.innerWidth, 0, 1) * duration
+    }
+
+    const onScroll = () => {
+      if (fine) return
+      scrolling = true
+      window.clearTimeout(scrollTimer)
+      scrollTimer = window.setTimeout(() => {
+        scrolling = false
+      }, 240)
+      const rect = rootEl.getBoundingClientRect()
+      const total = window.innerHeight + rect.height
+      const progress = clamp((window.innerHeight - rect.top) / total, 0, 1)
+      target = progress * duration
+      ping = target
+    }
+
+    const probeSeek = () =>
+      new Promise((resolve) => {
+        const want = Math.min(1.15, duration * 0.4)
+        let settled = false
+        const finish = (ok) => {
+          if (settled) return
+          settled = true
+          video.removeEventListener('seeked', onSeeked)
+          resolve(ok)
+        }
+        const onSeeked = () => finish(Math.abs(video.currentTime - want) < 0.35)
+        video.addEventListener('seeked', onSeeked)
+        try {
+          video.currentTime = want
+        } catch {
+          finish(false)
+        }
+        window.setTimeout(() => finish(false), 1200)
+      })
+
+    const start = async () => {
+      video.muted = true
+      video.defaultMuted = true
+      video.playsInline = true
+      video.preload = 'auto'
+      video.src = VIDEO_SRC
+      video.pause()
+      try {
+        await Promise.race([
+          new Promise((resolve, reject) => {
+            const ok = () => resolve()
+            const bad = () => reject()
+            video.addEventListener('loadeddata', ok, { once: true })
+            video.addEventListener('error', bad, { once: true })
+          }),
+          new Promise((_, reject) => {
+            window.setTimeout(() => reject(new Error('slow')), 4000)
+          }),
+        ])
+      } catch {
+        if (!dead) useFrames()
+        raf = requestAnimationFrame(loop)
+        return
+      }
+      if (dead) return
+      if (!Number.isFinite(video.duration) || video.duration <= 0) {
+        useFrames()
+      } else {
+        duration = video.duration
+        const reliable = await probeSeek()
+        if (dead) return
+        if (!reliable) useFrames()
+        else {
+          try {
+            video.currentTime = 0
+          } catch {
+            /* first frame is the poster */
+          }
+          await new Promise((resolve) => {
+            if (video.currentTime < 0.08) {
+              resolve()
+              return
+            }
+            const finish = () => resolve()
+            video.addEventListener('seeked', finish, { once: true })
+            window.setTimeout(finish, 400)
+          })
+          if (dead) return
+          shown = 0
+          target = 0
+          mode = 'video'
+          setEngine('video')
+        }
+      }
+      raf = requestAnimationFrame(loop)
+    }
+
+    window.addEventListener('pointermove', onMove, { passive: true })
+    window.addEventListener('scroll', onScroll, { passive: true })
+    start()
+
+    return () => {
+      dead = true
+      cancelAnimationFrame(raf)
+      window.clearTimeout(scrollTimer)
+      window.removeEventListener('pointermove', onMove)
+      window.removeEventListener('scroll', onScroll)
+      try {
+        video.pause()
+        video.removeAttribute('src')
+        video.load()
+      } catch {
+        /* unmount */
+      }
+    }
+  }, [reduce])
+
+  return (
+    <div className="absolute inset-0" ref={root}>
+      <img
+        alt=""
+        className="absolute inset-0 h-full w-full object-cover"
+        decoding="async"
+        draggable={false}
+        fetchPriority="high"
+        src={POSTER_SRC}
+        style={{ opacity: engine === 'poster' ? 1 : 0 }}
+      />
+      <video
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+        muted
+        playsInline
+        poster={POSTER_SRC}
+        preload={reduce ? 'none' : 'auto'}
+        ref={videoRef}
+        style={{ opacity: engine === 'video' ? 1 : 0 }}
+        tabIndex={-1}
+      />
+      <canvas
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 h-full w-full"
+        ref={canvasRef}
+        style={{ opacity: engine === 'frames' ? 1 : 0 }}
+      />
+    </div>
+  )
+}
+
+/* ===== src/components/PaintRoom.jsx ===== */
+const clamp = (n, a, b) => Math.min(b, Math.max(a, n))
+
+function SceneImage({ base, fallback }) {
+  return (
+    <picture className="pointer-events-none absolute inset-0 block h-full w-full">
+      <source media="(max-width: 767px)" srcSet={`/scroll-scene/mobile/${base}.webp`} type="image/webp" />
+      <source media="(max-width: 767px)" srcSet={`/scroll-scene/mobile/${base}.${fallback}`} />
+      <source srcSet={`/scroll-scene/desktop/${base}.webp`} type="image/webp" />
+      <img
+        alt=""
+        className="absolute inset-0 h-full w-full object-cover"
+        decoding="async"
+        draggable={false}
+        src={`/scroll-scene/desktop/${base}.${fallback}`}
+      />
+    </picture>
+  )
+}
+
+/**
+ * Pinned 200vh scene. Primer stays put, the painted wall wipes on like a
+ * roller, the sofa lags at 0.6×, and the foreground props drift outward.
+ * Reduced motion renders the finished room at its natural height.
+ */
+function PaintRoom() {
+  const reduce = useReducedMotion()
+  const sectionRef = useRef(null)
+  const pinRef = useRef(null)
+  const wipeRef = useRef(null)
+  const sofaRef = useRef(null)
+  const leftRef = useRef(null)
+  const rightRef = useRef(null)
+  const lineRef = useRef(null)
+
+  useEffect(() => {
+    if (reduce) return undefined
+    const section = sectionRef.current
+    const pin = pinRef.current
+    if (!section || !pin) return undefined
+
+    let raf = 0
+    const paint = () => {
+      const header = Number.parseFloat(
+        getComputedStyle(document.documentElement).getPropertyValue('--header-h')
+      ) || 0
+      const top = section.getBoundingClientRect().top
+      const travel = section.offsetHeight - pin.offsetHeight
+      const progress = travel > 0 ? clamp((header - top) / travel, 0, 1) : 1
+      const unit = Math.min(window.innerHeight * 0.1, 96)
+      if (wipeRef.current) {
+        wipeRef.current.style.clipPath = `inset(0 ${(1 - progress) * 100}% 0 0)`
+      }
+      if (sofaRef.current) {
+        sofaRef.current.style.transform = `translate3d(0, ${(progress * unit * 0.6).toFixed(2)}px, 0)`
+      }
+      if (leftRef.current) {
+        leftRef.current.style.transform = `translate3d(${(-progress * unit * 1.25).toFixed(2)}px, ${(progress * unit * 0.2).toFixed(2)}px, 0)`
+      }
+      if (rightRef.current) {
+        rightRef.current.style.transform = `translate3d(${(progress * unit * 1.4).toFixed(2)}px, ${(progress * unit * 0.15).toFixed(2)}px, 0)`
+      }
+      if (lineRef.current) lineRef.current.style.opacity = String(0.35 + progress * 0.65)
+    }
+
+    const onScroll = () => {
+      cancelAnimationFrame(raf)
+      raf = requestAnimationFrame(paint)
+    }
+
+    paint()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onScroll, { passive: true })
+    return () => {
+      cancelAnimationFrame(raf)
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
+    }
+  }, [reduce])
+
+  return (
+    <section
+      aria-label="Illustrative paint study"
+      className="paint-track relative h-[200vh]"
+      ref={sectionRef}
+    >
+      <div
+        className="paint-pin sticky z-0 overflow-hidden"
+        ref={pinRef}
+        style={{ top: 'var(--header-h)', height: 'calc(100svh - var(--header-h))' }}
+      >
+        <SceneImage base="bg-wall-primer" fallback="jpg" />
+        <div className="paint-wipe pointer-events-none absolute inset-0" ref={wipeRef}>
+          <SceneImage base="bg-wall-painted" fallback="jpg" />
+        </div>
+        <div className="paint-layer pointer-events-none absolute inset-0" ref={sofaRef}>
+          <SceneImage base="mid-sofa" fallback="png" />
+        </div>
+        <div className="paint-layer pointer-events-none absolute inset-0" ref={leftRef}>
+          <SceneImage base="fg-left" fallback="png" />
+        </div>
+        <div className="paint-layer pointer-events-none absolute inset-0" ref={rightRef}>
+          <SceneImage base="fg-right" fallback="png" />
+        </div>
+
+        <div className="pointer-events-none absolute inset-0 z-10 flex items-end px-gutter pb-24 md:items-center md:pb-16">
+          <div className="max-w-xl">
+            <p className="t-caps c-primary">Motion study</p>
+            <h2 className="t-h1 c-on mt-3">
+              <span className="block">From bare walls</span>
+              <span className="c-primary mt-1 block" ref={lineRef} style={{ opacity: reduce ? 1 : 0.35 }}>
+                to a finished room.
+              </span>
+            </h2>
+          </div>
+        </div>
+
+        <p className="chip badge-illustrative chip-wrap pointer-events-none absolute left-3 top-3 z-20 max-w-[16rem] sm:bottom-4 sm:left-6 sm:top-auto sm:max-w-xs">
+          Illustrative image, not a photo of Paint Force&apos;s work
+        </p>
+      </div>
+    </section>
+  )
+}
+
 /* ===== src/components/Nav.jsx ===== */
 function Nav({ onBook, onTrack }) {
   const [open, setOpen] = useState(false)
@@ -2999,8 +3456,6 @@ const RAIL = [
 
 function Home({ onBook }) {
   usePageMeta(site.seo.home.title, site.seo.home.description)
-  const media = useRef(null)
-  useParallax(media, 0.08)
   const servicesRef = useReveal()
   const workRef = useReveal()
   const featured = site.portfolio[0]
@@ -3009,31 +3464,24 @@ function Home({ onBook }) {
     <>
       <header className="relative md:flex md:min-h-[calc(100svh-var(--header-h))] md:flex-col md:justify-end md:overflow-hidden">
         <div className="relative h-[42vh] min-h-[220px] overflow-hidden md:absolute md:inset-0 md:h-auto md:min-h-0">
-          <div className="hero-parallax absolute -inset-x-6 -bottom-16 -top-16 md:-bottom-24 md:-top-20" ref={media}>
-            <SmartImage
-              alt={site.heroImage.alt}
-              className="hero-photo h-full w-full object-cover"
-              label={false}
-              priority
-              src={site.heroImage.src}
-              style={{ opacity: 0.5 }}
-            />
-          </div>
+          <HeroScrub />
           <div
-            className="absolute inset-0"
+            className="pointer-events-none absolute inset-0"
             style={{
               background:
-                'linear-gradient(to top, var(--background) 8%, rgba(16,20,23,.78) 46%, rgba(16,20,23,.28) 100%)',
+                'linear-gradient(to top, var(--background) 4%, rgba(16,20,23,.45) 42%, rgba(16,20,23,.12) 100%)',
             }}
           />
           <div
-            className="absolute inset-0"
+            className="pointer-events-none absolute inset-0"
             style={{
               background:
-                'linear-gradient(to right, var(--background) 0%, rgba(16,20,23,.4) 46%, transparent 78%)',
+                'linear-gradient(to right, var(--background) 0%, rgba(16,20,23,.28) 36%, transparent 68%)',
             }}
           />
-          <span className="chip badge-illustrative absolute right-4 top-4 sm:right-8">Illustrative</span>
+          <p className="chip badge-illustrative chip-wrap pointer-events-none absolute right-3 top-3 z-20 max-w-[15rem] sm:right-6 sm:top-5 sm:max-w-[20rem]">
+            Illustrative video, not footage of Paint Force&apos;s work
+          </p>
         </div>
 
         <div className="relative z-10 mx-auto w-full max-w-container px-gutter py-8 md:shrink-0 md:pb-40 md:pt-16">
@@ -3091,6 +3539,8 @@ function Home({ onBook }) {
           </dl>
         </div>
       </header>
+
+      <PaintRoom />
 
       <section className="s-low py-section">
         <div className="mx-auto grid max-w-container gap-10 px-gutter sm:grid-cols-3">

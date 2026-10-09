@@ -1,11 +1,11 @@
-import { useRef } from 'react'
 import { site } from '../site.config'
-import { usePageMeta, useParallax, useReveal, revealDelay } from '../lib/hooks'
+import { usePageMeta, useReveal, revealDelay } from '../lib/hooks'
 import { Link } from '../lib/router'
 import { BeforeAfter } from '../components/BeforeAfter'
 import { Counter } from '../components/Counter'
+import { HeroScrub } from '../components/HeroScrub'
 import { Icon } from '../components/Icon'
-import { SmartImage } from '../components/SmartImage'
+import { PaintRoom } from '../components/PaintRoom'
 import { Tilt } from '../components/Tilt'
 import { Placeholder } from '../components/Badges'
 
@@ -18,8 +18,6 @@ const RAIL = [
 
 export default function Home({ onBook }) {
   usePageMeta(site.seo.home.title, site.seo.home.description)
-  const media = useRef(null)
-  useParallax(media, 0.08)
   const servicesRef = useReveal()
   const workRef = useReveal()
   const featured = site.portfolio[0]
@@ -28,31 +26,24 @@ export default function Home({ onBook }) {
     <>
       <header className="relative md:flex md:min-h-[calc(100svh-var(--header-h))] md:flex-col md:justify-end md:overflow-hidden">
         <div className="relative h-[42vh] min-h-[220px] overflow-hidden md:absolute md:inset-0 md:h-auto md:min-h-0">
-          <div className="hero-parallax absolute -inset-x-6 -bottom-16 -top-16 md:-bottom-24 md:-top-20" ref={media}>
-            <SmartImage
-              alt={site.heroImage.alt}
-              className="hero-photo h-full w-full object-cover"
-              label={false}
-              priority
-              src={site.heroImage.src}
-              style={{ opacity: 0.5 }}
-            />
-          </div>
+          <HeroScrub />
           <div
-            className="absolute inset-0"
+            className="pointer-events-none absolute inset-0"
             style={{
               background:
-                'linear-gradient(to top, var(--background) 8%, rgba(16,20,23,.78) 46%, rgba(16,20,23,.28) 100%)',
+                'linear-gradient(to top, var(--background) 4%, rgba(16,20,23,.45) 42%, rgba(16,20,23,.12) 100%)',
             }}
           />
           <div
-            className="absolute inset-0"
+            className="pointer-events-none absolute inset-0"
             style={{
               background:
-                'linear-gradient(to right, var(--background) 0%, rgba(16,20,23,.4) 46%, transparent 78%)',
+                'linear-gradient(to right, var(--background) 0%, rgba(16,20,23,.28) 36%, transparent 68%)',
             }}
           />
-          <span className="chip badge-illustrative absolute right-4 top-4 sm:right-8">Illustrative</span>
+          <p className="chip badge-illustrative chip-wrap pointer-events-none absolute right-3 top-3 z-20 max-w-[15rem] sm:right-6 sm:top-5 sm:max-w-[20rem]">
+            Illustrative video, not footage of Paint Force&apos;s work
+          </p>
         </div>
 
         <div className="relative z-10 mx-auto w-full max-w-container px-gutter py-8 md:shrink-0 md:pb-40 md:pt-16">
@@ -110,6 +101,8 @@ export default function Home({ onBook }) {
           </dl>
         </div>
       </header>
+
+      <PaintRoom />
 
       <section className="s-low py-section">
         <div className="mx-auto grid max-w-container gap-10 px-gutter sm:grid-cols-3">

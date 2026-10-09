@@ -34,6 +34,8 @@ const ORDER = [
   'src/components/MapEmbed.jsx',
   'src/components/PageHero.jsx',
   'src/components/DemoBanner.jsx',
+  'src/components/HeroScrub.jsx',
+  'src/components/PaintRoom.jsx',
   'src/components/Nav.jsx',
   'src/components/Footer.jsx',
   'src/components/QuoteForm.jsx',

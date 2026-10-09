@@ -348,6 +348,21 @@ body {
     color: var(--on-surface);
     backdrop-filter: blur(6px);
   }
+  .chip-wrap { white-space: normal; text-align: left; line-height: 1.35; }
+
+  /* Primer shows until scroll assigns the roller wipe. */
+  .paint-wipe { clip-path: inset(0 100% 0 0); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .paint-track { height: auto !important; }
+    .paint-pin {
+      position: relative !important;
+      top: auto !important;
+      height: min(72vh, 720px) !important;
+    }
+    .paint-wipe { clip-path: none !important; }
+    .paint-layer { transform: none !important; }
+  }
 
   #main:focus { outline: none; }
 }
