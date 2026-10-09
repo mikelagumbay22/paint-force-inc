@@ -19,6 +19,7 @@ function brandCss() {
 const ORDER = [
   'src/site.config.js',
   'src/lib/api.js',
+  'src/lib/asset.js',
   'src/lib/hooks.js',
   'src/lib/router.jsx',
   'src/components/Icon.jsx',
@@ -58,6 +59,7 @@ const strip = (code) =>
     .replace(/^import\s+['"][^'"]+['"]\s*;?\s*$/gm, '')
     .replace(/^export\s+default\s+function/gm, 'function')
     .replace(/^export\s+/gm, '')
+    .replace(/import\.meta\.env\.BASE_URL/g, "'/'")
     .trim()
 
 const js = ORDER.map((f) => `/* ===== ${f} ===== */\n${strip(readFileSync(f, 'utf8'))}`).join('\n\n')

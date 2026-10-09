@@ -6,12 +6,12 @@ Business facts, colours, and images live in [`src/site.config.js`](src/site.conf
 
 ```bash
 npm install
-npm run dev      # http://localhost:5173
+npm run dev      # http://localhost:5173/paint-force-inc/
 npm run build    # production bundle in dist/
 node build-preview.mjs   # optional standalone preview.html
 ```
 
-This demo sends `noindex` and shows a “Demo concept” banner. It is not the live Paint Force website, and GitHub Pages is not part of the setup.
+This demo sends `noindex` and shows a “Demo concept” banner. It is not the live Paint Force website. The published sample is https://mikelagumbay22.github.io/paint-force-inc/. Vite `base` is `/paint-force-inc/`, and `.github/workflows/pages.yml` deploys `dist/` on pushes to `main`.
 
 ## Pages
 

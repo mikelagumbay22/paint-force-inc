@@ -1,15 +1,16 @@
 import { useEffect, useRef, useState } from 'react'
+import { publicUrl } from '../lib/asset'
 import { useReducedMotion } from '../lib/hooks'
 
-const VIDEO_SRC = '/hero-video/painter-turn-720p-intra.mp4'
-const POSTER_SRC = '/hero-video/poster.jpg'
+const VIDEO_SRC = publicUrl('/hero-video/painter-turn-720p-intra.mp4')
+const POSTER_SRC = publicUrl('/hero-video/poster.jpg')
 const FRAME_COUNT = 30
 const DURATION_FALLBACK = 3
 
 const clamp = (n, a, b) => Math.min(b, Math.max(a, n))
 
 function frameSrc(index) {
-  return `/hero-video/frames/frame-${String(index + 1).padStart(3, '0')}.jpg`
+  return publicUrl(`/hero-video/frames/frame-${String(index + 1).padStart(3, '0')}.jpg`)
 }
 
 function drawCover(ctx, img, width, height) {

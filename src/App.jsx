@@ -7,7 +7,8 @@ import { Nav } from './components/Nav'
 import { ToastProvider } from './components/Toast'
 import { TrackModal } from './components/TrackModal'
 import { useScrolled } from './lib/hooks'
-import { useRoute } from './lib/router'
+import { publicUrl } from './lib/asset'
+import { appHref, useRoute } from './lib/router'
 import { site } from './site.config'
 import AboutPage from './pages/AboutPage'
 import ContactPage from './pages/ContactPage'
@@ -51,7 +52,7 @@ function Shell() {
   useEffect(() => {
     if (new URLSearchParams(window.location.search).get('track') === '1') {
       setTracking(true)
-      window.history.replaceState({}, '', path)
+      window.history.replaceState({}, '', appHref(path))
     }
   }, [path])
 
@@ -85,7 +86,7 @@ function JsonLd() {
     '@type': 'AutoRepair',
     name: business.name,
     telephone: '+1-416-627-3948',
-    image: business.logo,
+    image: publicUrl(business.logo),
     address: {
       '@type': 'PostalAddress',
       streetAddress: business.street,

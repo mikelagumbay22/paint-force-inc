@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { publicUrl } from '../lib/asset'
 import { useReducedMotion } from '../lib/hooks'
 
 const clamp = (n, a, b) => Math.min(b, Math.max(a, n))
@@ -6,15 +7,15 @@ const clamp = (n, a, b) => Math.min(b, Math.max(a, n))
 function SceneImage({ base, fallback }) {
   return (
     <picture className="pointer-events-none absolute inset-0 block h-full w-full">
-      <source media="(max-width: 767px)" srcSet={`/scroll-scene/mobile/${base}.webp`} type="image/webp" />
-      <source media="(max-width: 767px)" srcSet={`/scroll-scene/mobile/${base}.${fallback}`} />
-      <source srcSet={`/scroll-scene/desktop/${base}.webp`} type="image/webp" />
+      <source media="(max-width: 767px)" srcSet={publicUrl(`/scroll-scene/mobile/${base}.webp`)} type="image/webp" />
+      <source media="(max-width: 767px)" srcSet={publicUrl(`/scroll-scene/mobile/${base}.${fallback}`)} />
+      <source srcSet={publicUrl(`/scroll-scene/desktop/${base}.webp`)} type="image/webp" />
       <img
         alt=""
         className="absolute inset-0 h-full w-full object-cover"
         decoding="async"
         draggable={false}
-        src={`/scroll-scene/desktop/${base}.${fallback}`}
+        src={publicUrl(`/scroll-scene/desktop/${base}.${fallback}`)}
       />
     </picture>
   )

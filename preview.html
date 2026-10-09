@@ -947,6 +947,38 @@ function formatPhone(value) {
   return `(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6)}`
 }
 
+/* ===== src/lib/asset.js ===== */
+/**
+ * Public-folder paths under the Vite `base` (GitHub Pages project site).
+ * `'/'` is `/` in local preview.html and `/paint-force-inc/`
+ * in the Pages build.
+ */
+function publicUrl(path) {
+  if (!path || /^(https?:)?\/\//.test(path) || path.startsWith('data:')) return path
+  const base = '/' || '/'
+  return `${base}${String(path).replace(/^\//, '')}`
+}
+
+/** App route (`/gallery`) from a browser pathname that includes the base. */
+function appPath(pathname) {
+  const base = ('/' || '/').replace(/\/$/, '')
+  let bare = String(pathname || '/').split('?')[0].split('#')[0]
+  if (base && (bare === base || bare.startsWith(`${base}/`))) {
+    bare = bare.slice(base.length) || '/'
+  }
+  if (!bare.startsWith('/')) bare = `/${bare}`
+  if (bare.length > 1 && bare.endsWith('/')) bare = bare.slice(0, -1)
+  return bare || '/'
+}
+
+/** Browser href for an app route, including the Pages subpath. */
+function appHref(to) {
+  const next = appPath(to)
+  const base = ('/' || '/').replace(/\/$/, '')
+  if (next === '/') return base ? `${base}/` : '/'
+  return `${base}${next}`
+}
+
 /* ===== src/lib/hooks.js ===== */
 /** Adds .is-visible once an element scrolls into view. One-shot: no replay on
  *  scroll-up, which reads as twitchy on a long page. */
@@ -1097,31 +1129,30 @@ function usePageMeta(title, description) {
 
 /* ===== src/lib/router.jsx ===== */
 /**
- * Two pages, no dependency. pushState + a listener set is all `useRoute`
- * needs; reaching for react-router here would be the site's first dependency
- * added for a single fork in the road.
+ * pushState plus a listener set. Routes stay root-shaped (`/gallery`);
+ * the browser path includes the Vite base so GitHub Pages project sites work.
  */
 const listeners = new Set()
 
 function normalizePath(path) {
-  const bare = String(path || '/').split('?')[0].split('#')[0]
-  if (bare.length > 1 && bare.endsWith('/')) return bare.slice(0, -1)
-  return bare || '/'
+  return appPath(path)
 }
 
+{ appHref }
+
 function navigate(to) {
-  const next = normalizePath(to)
-  if (next !== normalizePath(window.location.pathname)) {
-    window.history.pushState({}, '', next)
+  const next = appPath(to)
+  if (next !== appPath(window.location.pathname)) {
+    window.history.pushState({}, '', appHref(next))
     listeners.forEach((l) => l())
   }
   window.scrollTo(0, 0)
 }
 
 function useRoute() {
-  const [path, setPath] = useState(() => normalizePath(window.location.pathname))
+  const [path, setPath] = useState(() => appPath(window.location.pathname))
   useEffect(() => {
-    const onChange = () => setPath(normalizePath(window.location.pathname))
+    const onChange = () => setPath(appPath(window.location.pathname))
     listeners.add(onChange)
     window.addEventListener('popstate', onChange)
     return () => {
@@ -1135,7 +1166,7 @@ function useRoute() {
 function Link({ to, onClick, children, ...rest }) {
   return (
     <a
-      href={to}
+      href={appHref(to)}
       onClick={(e) => {
         onClick?.(e)
         if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
@@ -1820,15 +1851,15 @@ function DemoBanner() {
 }
 
 /* ===== src/components/HeroScrub.jsx ===== */
-const VIDEO_SRC = '/hero-video/painter-turn-720p-intra.mp4'
-const POSTER_SRC = '/hero-video/poster.jpg'
+const VIDEO_SRC = publicUrl('/hero-video/painter-turn-720p-intra.mp4')
+const POSTER_SRC = publicUrl('/hero-video/poster.jpg')
 const FRAME_COUNT = 30
 const DURATION_FALLBACK = 3
 
 const clamp = (n, a, b) => Math.min(b, Math.max(a, n))
 
 function frameSrc(index) {
-  return `/hero-video/frames/frame-${String(index + 1).padStart(3, '0')}.jpg`
+  return publicUrl(`/hero-video/frames/frame-${String(index + 1).padStart(3, '0')}.jpg`)
 }
 
 function drawCover(ctx, img, width, height) {
@@ -2142,15 +2173,15 @@ const clamp = (n, a, b) => Math.min(b, Math.max(a, n))
 function SceneImage({ base, fallback }) {
   return (
     <picture className="pointer-events-none absolute inset-0 block h-full w-full">
-      <source media="(max-width: 767px)" srcSet={`/scroll-scene/mobile/${base}.webp`} type="image/webp" />
-      <source media="(max-width: 767px)" srcSet={`/scroll-scene/mobile/${base}.${fallback}`} />
-      <source srcSet={`/scroll-scene/desktop/${base}.webp`} type="image/webp" />
+      <source media="(max-width: 767px)" srcSet={publicUrl(`/scroll-scene/mobile/${base}.webp`)} type="image/webp" />
+      <source media="(max-width: 767px)" srcSet={publicUrl(`/scroll-scene/mobile/${base}.${fallback}`)} />
+      <source srcSet={publicUrl(`/scroll-scene/desktop/${base}.webp`)} type="image/webp" />
       <img
         alt=""
         className="absolute inset-0 h-full w-full object-cover"
         decoding="async"
         draggable={false}
-        src={`/scroll-scene/desktop/${base}.${fallback}`}
+        src={publicUrl(`/scroll-scene/desktop/${base}.${fallback}`)}
       />
     </picture>
   )
@@ -2304,7 +2335,7 @@ function Nav({ onBook, onTrack }) {
               alt=""
               className="h-9 w-9 shrink-0 object-contain"
               draggable={false}
-              src={site.business.logo}
+              src={publicUrl(site.business.logo)}
             />
             <span className="t-h3 c-on truncate leading-none tracking-tight">
               {site.business.name}
@@ -2402,7 +2433,7 @@ function Footer({ onTrack }) {
         <div className="grid gap-10 md:grid-cols-12">
           <div className="md:col-span-4">
             <span className="flex items-center gap-2.5">
-              <img alt="" className="h-9 w-9 object-contain" draggable={false} src={site.business.logo} />
+              <img alt="" className="h-9 w-9 object-contain" draggable={false} src={publicUrl(site.business.logo)} />
               <span className="t-h2 c-on">
                 {site.business.name}
                 <span className="c-primary">.</span>
@@ -3812,7 +3843,7 @@ function AboutPage() {
             <img
               alt={site.business.logoAlt}
               className="s-lowest hairline max-h-40 w-full object-contain p-4"
-              src={site.business.logo}
+              src={publicUrl(site.business.logo)}
             />
             <Placeholder>Room for professional photos</Placeholder>
           </div>
@@ -4045,7 +4076,7 @@ function Shell() {
   useEffect(() => {
     if (new URLSearchParams(window.location.search).get('track') === '1') {
       setTracking(true)
-      window.history.replaceState({}, '', path)
+      window.history.replaceState({}, '', appHref(path))
     }
   }, [path])
 
@@ -4079,7 +4110,7 @@ function JsonLd() {
     '@type': 'AutoRepair',
     name: business.name,
     telephone: '+1-416-627-3948',
-    image: business.logo,
+    image: publicUrl(business.logo),
     address: {
       '@type': 'PostalAddress',
       streetAddress: business.street,

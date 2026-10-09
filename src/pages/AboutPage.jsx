@@ -1,3 +1,4 @@
+import { publicUrl } from '../lib/asset'
 import { site } from '../site.config'
 import { revealDelay, usePageMeta, useReveal } from '../lib/hooks'
 import { Link } from '../lib/router'
@@ -77,7 +78,7 @@ export default function AboutPage() {
             <img
               alt={site.business.logoAlt}
               className="s-lowest hairline max-h-40 w-full object-contain p-4"
-              src={site.business.logo}
+              src={publicUrl(site.business.logo)}
             />
             <Placeholder>Room for professional photos</Placeholder>
           </div>

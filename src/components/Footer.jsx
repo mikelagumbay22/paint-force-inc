@@ -1,3 +1,4 @@
+import { publicUrl } from '../lib/asset'
 import { site } from '../site.config'
 import { Link } from '../lib/router'
 import { GoogleReviewButton } from './GoogleReviewButton'
@@ -12,7 +13,7 @@ export function Footer({ onTrack }) {
         <div className="grid gap-10 md:grid-cols-12">
           <div className="md:col-span-4">
             <span className="flex items-center gap-2.5">
-              <img alt="" className="h-9 w-9 object-contain" draggable={false} src={site.business.logo} />
+              <img alt="" className="h-9 w-9 object-contain" draggable={false} src={publicUrl(site.business.logo)} />
               <span className="t-h2 c-on">
                 {site.business.name}
                 <span className="c-primary">.</span>

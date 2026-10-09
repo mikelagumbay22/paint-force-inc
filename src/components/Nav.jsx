@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { site } from '../site.config'
+import { publicUrl } from '../lib/asset'
 import { useBodyLock, useScrolled } from '../lib/hooks'
 import { Link, useRoute } from '../lib/router'
 import { Icon } from './Icon'
@@ -46,7 +47,7 @@ export function Nav({ onBook, onTrack }) {
               alt=""
               className="h-9 w-9 shrink-0 object-contain"
               draggable={false}
-              src={site.business.logo}
+              src={publicUrl(site.business.logo)}
             />
             <span className="t-h3 c-on truncate leading-none tracking-tight">
               {site.business.name}

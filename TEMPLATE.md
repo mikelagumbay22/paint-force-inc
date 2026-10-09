@@ -92,7 +92,7 @@ Do not enable GitHub Pages from this template unless the client has asked for th
 
 ```bash
 npm install
-npm run dev      # http://localhost:5173
+npm run dev      # http://localhost:5173/paint-force-inc/
 npm run build    # production bundle in dist/
 node build-preview.mjs   # optional single-file preview.html
 ```
