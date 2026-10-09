@@ -3,14 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title>Paint Force — Mobile paint &amp; scratch repair</title>
+<title>Paint Force — Mobile paint and scratch repair in Mississauga</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Paint Force offers mobile scratch removal, paint touch-up, and bumper repair in Mississauga, Ontario. Request a quote or call (416) 627-3948. 6545 Cedar Rapids Crescent.">
 <link href="https://fonts.googleapis.com" rel="preconnect">
 <link crossorigin href="https://fonts.gstatic.com" rel="preconnect">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
 
 <!-- Token stylesheet loads first so Tailwind's utilities win on equal specificity -->
 <style>
-500;600&family=JetBrains+Mono:wght@400;500;700&family=Montserrat:wght@600;700;800;900&display=swap');
+:root{--background:#101417;--surface:#101417;--surface-dim:#101417;--surface-bright:#36393e;--surface-container-lowest:#0b0f12;--surface-container-low:#181c20;--surface-container:#1c2024;--surface-container-high:#272a2e;--surface-container-highest:#323539;--surface-variant:#323539;--on-surface:#e0e2e8;--on-surface-variant:#e7bdb2;--primary:#ffb5a0;--on-primary:#601400;--primary-container:#ff5625;--on-primary-container:#541100;--primary-fixed:#ffdbd1;--inverse-primary:#b12d00;--secondary:#c1c7cf;--tertiary:#c8c6c5;--outline:#ad887e;--outline-variant:#5d4038;--error:#ffb4ab;--error-container:#93000a;--on-error-container:#ffdad6;--banner-h:34px;--nav-h:68px;--header-h:calc(var(--banner-h) + var(--nav-h))}
+
 
 
 
@@ -25,36 +28,11 @@
 
 
 :root {
-  --background: #101417;
-  --surface: #101417;
-  --surface-dim: #101417;
-  --surface-bright: #36393e;
-  --surface-container-lowest: #0b0f12;
-  --surface-container-low: #181c20;
-  --surface-container: #1c2024;
-  --surface-container-high: #272a2e;
-  --surface-container-highest: #323539;
-  --surface-variant: #323539;
-
-  --on-surface: #e0e2e8;
-  --on-surface-variant: #e7bdb2;
-
-  --primary: #ffb5a0;
-  --on-primary: #601400;
-  --primary-container: #ff5625;
-  --on-primary-container: #541100;
-  --primary-fixed: #ffdbd1;
-  --inverse-primary: #b12d00;
-
-  --secondary: #c1c7cf;
-  --tertiary: #c8c6c5;
-
-  --outline: #ad887e;
-  --outline-variant: #5d4038;
-
-  --error: #ffb4ab;
-  --error-container: #93000a;
-  --on-error-container: #ffdad6;
+  /* Brand colours and --banner-h / --nav-h / --header-h are injected from
+     src/site.config.js by the Vite plugin (and by build-preview.mjs). */
+  --banner-h: 34px;
+  --nav-h: 68px;
+  --header-h: calc(var(--banner-h) + var(--nav-h));
 
   --font-display: 'Montserrat', system-ui, sans-serif;
   --font-body: 'Inter', system-ui, sans-serif;
@@ -67,10 +45,11 @@
 
 * { border-color: color-mix(in srgb, var(--outline-variant) 20%, transparent); }
 
-html { scroll-behavior: smooth; scroll-padding-top: 88px; }
+html { scroll-behavior: smooth; scroll-padding-top: calc(var(--header-h) + 16px); }
 
 body {
   margin: 0;
+  padding-top: var(--header-h);
   background: var(--background);
   color: var(--on-surface);
   font-family: var(--font-body);
@@ -185,7 +164,7 @@ body {
     border-radius: var(--radius);
     padding: 12px 14px;
     font-family: var(--font-body);
-    font-size: 15px;
+    font-size: 16px;
     outline: none;
     transition: border-color .18s ease, box-shadow .18s ease;
   }
@@ -257,8 +236,18 @@ body {
       animation-duration: .01ms !important;
       animation-iteration-count: 1 !important;
       transition-duration: .01ms !important;
+      scroll-behavior: auto !important;
     }
-    .reveal { opacity: 1; transform: none; }
+    .reveal,
+    .rise,
+    .page-enter,
+    .menu-item,
+    .menu-panel,
+    .hero-photo {
+      opacity: 1 !important;
+      transform: none !important;
+      animation: none !important;
+    }
   }
 
   /* --- Utilities ----------------------------------------------------------- */
@@ -276,6 +265,121 @@ body {
       color-mix(in srgb, var(--outline) 12%, transparent) 1px, transparent 0);
     background-size: 4px 4px;
   }
+
+  .tabular { font-variant-numeric: tabular-nums; }
+
+  .demo-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 90;
+    height: var(--banner-h);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 0 16px;
+    background: var(--primary-container);
+    color: var(--on-primary-container);
+    font-weight: 600;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .site-nav {
+    position: fixed;
+    top: var(--banner-h);
+    left: 0;
+    right: 0;
+    z-index: 80;
+    height: var(--nav-h);
+  }
+
+  .nav-link { position: relative; }
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 2px;
+    height: 1px;
+    width: 100%;
+    background: var(--primary-container);
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform .28s cubic-bezier(.2,.7,.3,1);
+  }
+  .nav-link:hover::after,
+  .nav-link[aria-current='page']::after { transform: scaleX(1); }
+
+  .btn .nudge { transition: transform .22s cubic-bezier(.2,.7,.3,1); }
+  @media (prefers-reduced-motion: no-preference) {
+    .btn:hover .nudge { transform: translateX(4px); }
+  }
+
+  .page-enter { animation: page-in .5s cubic-bezier(.2,.7,.3,1) both; }
+  @keyframes page-in {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  .rise { opacity: 0; animation: hero-rise .75s cubic-bezier(.2,.7,.3,1) both; }
+  @keyframes hero-rise {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  .hero-photo {
+    transform: scale(1.06);
+    animation: hero-drift 22s ease-in-out alternate infinite;
+  }
+  @keyframes hero-drift {
+    from { transform: scale(1.06) translate3d(0, 0, 0); }
+    to { transform: scale(1.12) translate3d(-1.5%, -2%, 0); }
+  }
+  @media (max-width: 767px) {
+    .hero-photo { animation: none; transform: scale(1.04); }
+  }
+
+  .menu-panel { animation: menu-in .32s cubic-bezier(.2,.7,.3,1) both; }
+  @keyframes menu-in {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: none; }
+  }
+  .menu-item { opacity: 0; transform: translateY(8px); }
+  .menu-open .menu-item {
+    opacity: 1;
+    transform: none;
+    transition: opacity .35s ease, transform .35s ease;
+  }
+
+  .badge-placeholder {
+    background: color-mix(in srgb, var(--primary-container) 16%, transparent);
+    color: var(--primary-fixed);
+    border-color: color-mix(in srgb, var(--primary-container) 45%, transparent);
+  }
+  .badge-illustrative {
+    background: rgba(11, 15, 18, .72);
+    color: var(--on-surface);
+    backdrop-filter: blur(6px);
+  }
+  .chip-wrap { white-space: normal; text-align: left; line-height: 1.35; }
+
+  /* Primer shows until scroll assigns the roller wipe. */
+  .paint-wipe { clip-path: inset(0 100% 0 0); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .paint-track { height: auto !important; }
+    .paint-pin {
+      position: relative !important;
+      top: auto !important;
+      height: min(72vh, 720px) !important;
+    }
+    .paint-wipe { clip-path: none !important; }
+    .paint-layer { transform: none !important; }
+  }
+
+  #main:focus { outline: none; }
 
 
 </style>
@@ -318,163 +422,327 @@ tailwind.config = {
 <script type="text/babel" data-type="module">
 const { useState, useEffect, useRef, useMemo, useCallback, createContext, useContext } = React
 
-/* ===== src/lib/data.js ===== */
+/* ===== src/site.config.js ===== */
 /**
- * Site content.
+ * Northpage Premium template — the only file you edit to rebrand a client site.
+ * Colours, name, phone, hours, services, copy, and images all live here.
+ * See TEMPLATE.md.
  *
- * Image URLs came out of the original design export and are hosted on Google's
- * CDN, which expires them. Every <img> in this app degrades to a tonal
- * placeholder if the fetch fails, so a dead link never leaves a white box —
- * but swap these for your own photography before launch.
+ * Facts below are only what this repo already stated for Paint Force.
+ * Anything unconfirmed is flagged `placeholder: true` or `illustrative: true`.
+ * Do not add a personal email address.
  */
 
-const HERO_IMAGE =
-  'https://lh3.googleusercontent.com/aida-public/AB6AXuAQ3ndOaeU9PS4l-7uTTilPy3mIBektPOxZQ_wGrl0l14xsdNKsZKyoV_Uli9o_Ww4eDJBRKy0Zm2yQ5uFSyKCrgUcuoCzDYc0FTmFg33OZz5DryEW5fTLx800R6MwqqnOWzoQc2JNwfgfPwFrRcK43fYLBYLRxOViWbTawlH7JfUSgkY0TjoVgL8bd-8lj1uhamsfTtarvGfxeLaaXAvxtlKquGBBR2hizHR7BFjTIPvO3gKVF7GOqKA'
+const theme = {
+  '--background': '#101417',
+  '--surface': '#101417',
+  '--surface-dim': '#101417',
+  '--surface-bright': '#36393e',
+  '--surface-container-lowest': '#0b0f12',
+  '--surface-container-low': '#181c20',
+  '--surface-container': '#1c2024',
+  '--surface-container-high': '#272a2e',
+  '--surface-container-highest': '#323539',
+  '--surface-variant': '#323539',
+  '--on-surface': '#e0e2e8',
+  '--on-surface-variant': '#e7bdb2',
+  '--primary': '#ffb5a0',
+  '--on-primary': '#601400',
+  '--primary-container': '#ff5625',
+  '--on-primary-container': '#541100',
+  '--primary-fixed': '#ffdbd1',
+  '--inverse-primary': '#b12d00',
+  '--secondary': '#c1c7cf',
+  '--tertiary': '#c8c6c5',
+  '--outline': '#ad887e',
+  '--outline-variant': '#5d4038',
+  '--error': '#ffb4ab',
+  '--error-container': '#93000a',
+  '--on-error-container': '#ffdad6',
+}
 
-const LOGO =
-  'https://lh3.googleusercontent.com/aida-public/AB6AXuDgcDgyu-_aC3bfPseZnpbFN2USggF0qqyHV6127qFuy7KrmH8QTpj6qMLD1jD6C5LC8Y4sCgOV8ANfoGmFsjtlMmTI0rcTJ2kBT7bEumyFN4M86UDsrdi1VlobOBkAiuDTsgccus7YPLwpRSF4tQ9cpp-OcUx5nNm5JP_3TENUq26Atz1MrULztyUnh4nuZ4BW5VdPsLv2CK5IF9oRA-OYjs02WKNj115mhOZEmi7H11-SATaBeWCUbw'
+const site = {
+  /** Set `show` to false and remove the robots meta when a real client site launches. */
+  demo: {
+    show: true,
+    label: 'Demo concept',
+    message: 'Northpage Premium sample. Not the live Paint Force website.',
+  },
 
-const SERVICES = [
-  {
-    id: 'scratch',
-    icon: 'wand',
-    name: 'Scratch removal',
-    est: '1–2 HRS',
-    price: 'from $189',
-    blurb:
-      'Clear-coat correction with graded micro-abrasives. Removes the scratch instead of filling it, so the panel keeps its factory depth.',
-    detail: [
-      'Depth-tested with a paint gauge before any cutting',
-      'Machine polish through 3 abrasive grades',
-      'Sealed with a ceramic-infused protectant',
+  studio: {
+    name: 'Northpage',
+    package: 'Premium',
+  },
+
+  business: {
+    name: 'Paint Force',
+    phone: '(416) 627-3948',
+    phoneHref: 'tel:4166273948',
+    street: '6545 Cedar Rapids Crescent',
+    city: 'Mississauga',
+    region: 'ON',
+    country: 'CA',
+    address: '6545 Cedar Rapids Crescent, Mississauga, ON',
+    logo: '/logo.png',
+    logoAlt: 'Paint Force',
+    /** Leave empty until the client supplies a Google review link. Never invent one. */
+    googleReviewUrl: '',
+    warranty: 'Lifetime workmanship warranty',
+    tagline: 'Showroom finish, in your driveway.',
+    summary:
+      'Paint Force is a mobile paint and scratch repair service based at 6545 Cedar Rapids Crescent, Mississauga, Ontario. Scratch removal, paint touch-up, and bumper repair are finished on site.',
+  },
+
+  /**
+   * Hours were marked as placeholders in the previous draft.
+   * They are shown so the layout is real, and badged so they are not read as confirmed.
+   */
+  hours: {
+    placeholder: true,
+    note: 'Placeholder hours from the previous draft. Confirm them before launch.',
+    rows: [
+      ['Monday – Friday', '07:00 – 18:00'],
+      ['Saturday', '08:00 – 16:00'],
+      ['Sunday', 'Closed'],
     ],
   },
-  {
-    id: 'touchup',
-    icon: 'paint',
-    name: 'Paint touch-up',
-    est: '2–3 HRS',
-    price: 'from $240',
-    blurb:
-      'Rock chips and scuffs filled with paint mixed to your VIN code, then levelled flush so the repair disappears at arm’s length.',
-    detail: [
-      'Colour matched to your VIN, not a chart',
-      'Spectrophotometer check under three light temperatures',
-      'Blended into adjacent panels to hide the edge',
+
+  /** Cities beyond the street address were not confirmed. */
+  serviceArea: {
+    placeholder: true,
+    confirmed: 'Mississauga, ON',
+    note: 'Wider service area was a placeholder on the previous draft. Confirm the cities you cover before publishing a list.',
+  },
+
+  heroImage: {
+    src: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAQ3ndOaeU9PS4l-7uTTilPy3mIBektPOxZQ_wGrl0l14xsdNKsZKyoV_Uli9o_Ww4eDJBRKy0Zm2yQ5uFSyKCrgUcuoCzDYc0FTmFg33OZz5DryEW5fTLx800R6MwqqnOWzoQc2JNwfgfPwFrRcK43fYLBYLRxOViWbTawlH7JfUSgkY0TjoVgL8bd-8lj1uhamsfTtarvGfxeLaaXAvxtlKquGBBR2hizHR7BFjTIPvO3gKVF7GOqKA',
+    alt: 'Illustrative photo of a panel being machine-polished under controlled lighting',
+    illustrative: true,
+  },
+
+  /** Counts derived from content on this site, not from unverified business stats. */
+  counters: [
+    { value: 3, label: 'Services listed', note: 'Scratch, touch-up, bumper' },
+    { value: 2, label: 'Hour visit windows', note: 'As described on this site' },
+    { value: 3, label: 'Sample panels', note: 'Illustrative gallery' },
+  ],
+
+  services: [
+    {
+      id: 'scratch',
+      icon: 'wand',
+      name: 'Scratch removal',
+      est: '1–2 HRS',
+      price: 'from $189',
+      pricePlaceholder: true,
+      blurb:
+        'Clear-coat correction with graded micro-abrasives. Removes the scratch instead of filling it, so the panel keeps its factory depth.',
+      detail: [
+        'Depth-tested with a paint gauge before any cutting',
+        'Machine polish through 3 abrasive grades',
+        'Sealed with a ceramic-infused protectant',
+      ],
+    },
+    {
+      id: 'touchup',
+      icon: 'paint',
+      name: 'Paint touch-up',
+      est: '2–3 HRS',
+      price: 'from $240',
+      pricePlaceholder: true,
+      blurb:
+        'Rock chips and scuffs filled with paint mixed to your VIN code, then levelled flush so the repair disappears at arm’s length.',
+      detail: [
+        'Colour matched to your VIN, not a chart',
+        'Spectrophotometer check under three light temperatures',
+        'Blended into adjacent panels to hide the edge',
+      ],
+    },
+    {
+      id: 'bumper',
+      icon: 'car',
+      name: 'Bumper repair',
+      est: '3–4 HRS',
+      price: 'from $420',
+      pricePlaceholder: true,
+      blurb:
+        'Plastic welding and localised refinishing for cracks, scuffs and parking-lot damage. No dealership queue, no replacement part.',
+      detail: [
+        'Nitrogen plastic welding on cracks and tabs',
+        'Contour rebuilt with flexible filler',
+        'Refinished and clear-coated on site',
+      ],
+    },
+  ],
+
+  process: [
+    {
+      n: '01',
+      title: 'Send photos',
+      body: 'Upload shots of the damage. A technician reads them and returns a fixed price, not a range.',
+      meta: 'STATED REPLY ABOUT 2 HRS',
+    },
+    {
+      n: '02',
+      title: 'Pick a window',
+      body: 'Choose a two-hour slot at your home or office. The mobile unit arrives with power, water and paint on board.',
+      meta: 'TWO-HOUR WINDOWS',
+    },
+    {
+      n: '03',
+      title: 'Drive it away',
+      body: 'Work finishes in your driveway. No courtesy car, no shop visit, no week without your vehicle.',
+      meta: 'SAME-DAY FINISH',
+    },
+  ],
+
+  portfolio: [
+    {
+      id: 'p1',
+      tag: 'DEEP SCRATCH',
+      vehicle: 'Audi A4 · door skin',
+      duration: '2 HRS ON SITE',
+      composite: true,
+      illustrative: true,
+      src: 'https://lh3.googleusercontent.com/aida-public/AB6AXuA6EmPRaaiEllJgETUo4QTqaXZpm081_dTyUMOfqZIm752n_-6ukNaxSYbuvphdElS1bTuwFx7f8ofugEW8GDHYbGeUW47gLunndpF0nduFn150zel9QO-_vkgFQRIZwgaswQxPEbm6ZtS3VQnPb0C0ljPiXqAvY2KVGlj54-3babvo0K0d3yM6pqrtUhvProfh2ZFAOpb5XrA8MWQyjnOq4EGctgYwQBteCul3oNTWgcEqEOCeueqSOw',
+      quote:
+        'The scratch is completely gone. I didn’t think they could fix it without repainting the whole panel.',
+      author: 'Mark R.',
+      initials: 'MR',
+    },
+    {
+      id: 'p2',
+      tag: 'PAINT CORRECTION',
+      vehicle: 'BMW M340i · hood',
+      duration: '3 HRS ON SITE',
+      composite: true,
+      illustrative: true,
+      src: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDpro0bVHx0-oxJRmYR_8rKGeYaIkhbhX8uhv_lb7CLY3q9AKYzrlMYPvKCAHLBuyO4KnmEu9rGgGiJN0StmzaX693OPGQZ7pzFhvgcdmT2LIh6e2C6FHbDNb4LzyeLJOzKXRLMUeU5HVJ5Mzu99kVqH_PtHO_dNQOWYcPMPi8MgY82TLidJENx1NcxaQuWwNjIxbz5z5P57kL2OIm3LH-FLyr9SSjn5NqIDiFKI0L8Nf-9lZXy6rw3Tg',
+      quote: 'Looks better than the day I drove it off the lot, and it happened in my own garage.',
+      author: 'Sarah L.',
+      initials: 'SL',
+    },
+    {
+      id: 'p3',
+      tag: 'BUMPER REPAIR',
+      vehicle: 'Mercedes C300 · rear bumper',
+      duration: '4 HRS ON SITE',
+      composite: true,
+      illustrative: true,
+      src: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDcoRWCGLFjbwu_YvUitW3mv5AodyEv6rUWghPA4n5pQ_ezM_t0EBBUO43XYI17IuJJn7K_ZQm6iAB3xr1IWAE21ELpbYPlDTVzaBVZdHUdzrKuZMPYTFL6uBoLJ8mE7ZzKbV_-mbLeuYQ2oncBu3eFiP86OTfD6nLWzGdh6UMPtfXm7hapTnsAjBo_c_619TahB5WcjSCeZOGoA8BijcZ8R4uGPPTELqqA0TBIHgCCjdwAHmsKOmMWpg',
+      quote: 'Hundreds less than the body shop quote and done in an afternoon. Highly professional tech.',
+      author: 'David T.',
+      initials: 'DT',
+    },
+  ],
+
+  reviews: {
+    placeholder: true,
+    note: 'Sample testimonials kept from the previous draft. They are not confirmed Google reviews. Replace them before launch.',
+    items: [
+      {
+        quote:
+          'Incredible service. They fixed a deep scratch on my Tesla right in my driveway. The colour match is flawless and it saved me days without the car.',
+        author: 'Michael T.',
+        location: 'MISSISSAUGA, ON',
+        vehicle: 'TESLA MODEL 3',
+      },
+      {
+        quote:
+          'Professional from start to finish. The tech was meticulous and treated my Porsche with real care. The bumper looks brand new.',
+        author: 'Sarah J.',
+        location: 'OAKVILLE, ON',
+        vehicle: 'PORSCHE MACAN',
+      },
     ],
   },
-  {
-    id: 'bumper',
-    icon: 'car',
-    name: 'Bumper repair',
-    est: '3–4 HRS',
-    price: 'from $420',
-    blurb:
-      'Plastic welding and localised refinishing for cracks, scuffs and parking-lot damage. No dealership queue, no replacement part.',
-    detail: [
-      'Nitrogen plastic welding on cracks and tabs',
-      'Contour rebuilt with flexible filler',
-      'Refinished and clear-coated on site',
-    ],
-  },
-]
 
-const PROCESS = [
-  {
-    n: '01',
-    title: 'Send photos',
-    body: 'Upload shots of the damage. A technician reads them and returns a fixed price, not a range.',
-    meta: 'AVG. REPLY 2 HRS',
-  },
-  {
-    n: '02',
-    title: 'Pick a window',
-    body: 'Choose a two-hour slot at your home or office. The mobile unit arrives with power, water and paint on board.',
-    meta: '7 DAYS A WEEK',
-  },
-  {
-    n: '03',
-    title: 'Drive it away',
-    body: 'Work finishes in your driveway. No courtesy car, no shop visit, no week without your vehicle.',
-    meta: 'SAME-DAY FINISH',
-  },
-]
+  faq: [
+    {
+      q: 'Do you come to the car?',
+      a: 'Yes. Paint Force works from a mobile unit at your home or office in Mississauga, so the car stays in the driveway.',
+    },
+    {
+      q: 'What do you repair?',
+      a: 'Three services are listed: scratch removal, paint touch-up matched to the VIN, and bumper repair with plastic welding and local refinishing.',
+    },
+    {
+      q: 'How do I get a price?',
+      a: 'Send photos through the quote form. The previous draft said a technician returns a fixed price, usually within about two hours. Nothing is charged to send the request.',
+    },
+    {
+      q: 'Where are you based?',
+      a: '6545 Cedar Rapids Crescent, Mississauga, ON. Call (416) 627-3948.',
+    },
+    {
+      q: 'What are your hours?',
+      a: 'The hours on the contact page are placeholders from the previous draft (Monday to Friday 07:00–18:00, Saturday 08:00–16:00, Sunday closed). Confirm them before launch.',
+    },
+    {
+      q: 'Which cities do you cover?',
+      a: 'The confirmed address is in Mississauga. A wider service area was listed as a placeholder before and is not published here until it is confirmed.',
+    },
+    {
+      q: 'How do I leave a Google review?',
+      a: 'Use the “Leave us a Google review” button. The link is a placeholder until the real Google review URL is added in site.config.js.',
+    },
+    {
+      q: 'How do I track a repair?',
+      a: 'Open Track repair and enter the reference from your confirmation. This demo includes sample jobs PF-2481, PF-7752, and PF-1039 so the tracker can be tried. They are not live customer records.',
+    },
+  ],
 
-/**
- * Portfolio pieces.
- *
- * `composite: true` means the source file is a single side-by-side image with
- * the damaged state on the left and the finished state on the right — the
- * comparison slider crops each half rather than needing two files. When you
- * have separate photographs, drop the flag and pass `before` and `after`.
- */
-const PORTFOLIO = [
-  {
-    id: 'p1',
-    tag: 'DEEP SCRATCH',
-    vehicle: 'Audi A4 · door skin',
-    duration: '2 HRS ON SITE',
-    composite: true,
-    src: 'https://lh3.googleusercontent.com/aida/AEtjO1VBqQ7bh-1KopYPz04Ws4synn1AOsiU9VS9dxWLOzG6drUf_dmRoLL9zMo9IGqHoSlgwBvXdOlfowcAgGjlAhfqdGnwI9YnDDIoE1aP2ZqWSLmyjJP8Qalm1ODi5f8KqS5VOG-1nLfkXXxeEqsOoTdqAONGVgj-QKBnalx5QaT_kAJlvczDKsyc8gVZEn8gX076zVtxEaA3wBMfdbvpCCJCL7SOE7omHRk68KKEfuYyXJwFROlHCHSOxGbO',
-    quote:
-      'The scratch is completely gone. I didn’t think they could fix it without repainting the whole panel.',
-    author: 'Mark R.',
-    initials: 'MR',
-  },
-  {
-    id: 'p2',
-    tag: 'PAINT CORRECTION',
-    vehicle: 'BMW M340i · hood',
-    duration: '3 HRS ON SITE',
-    composite: true,
-    src: 'https://lh3.googleusercontent.com/aida/AEtjO1XUINJmoQ51ESra0ELivdMwadfjK9c3Nu2WuTNUlKOo7DHPpCh1i5U4yQf7tpD9pziNcEd4F-aE_NOv2ABXoYRcJS0OCpmzJJ1tGOxsEFqgV65TECkzd5mpV_8HIqQepSGLWZaOVH_u8GWlcx3J_sZmuSGwzlxd-w6RRN1890NQLVENfAYr6GdiQeF56UT_-rgxbQnKBKNGCmKK7X-1PfnDD9-7S84bS66jfvXcGVSkhn4sy-lNAOHZ_ioU',
-    quote:
-      'Looks better than the day I drove it off the lot, and it happened in my own garage.',
-    author: 'Sarah L.',
-    initials: 'SL',
-  },
-  {
-    id: 'p3',
-    tag: 'BUMPER REPAIR',
-    vehicle: 'Mercedes C300 · rear bumper',
-    duration: '4 HRS ON SITE',
-    composite: true,
-    src: 'https://lh3.googleusercontent.com/aida/AEtjO1XQWNnsaz4oWjtE2s2ypAJyOUbyJiNr3lLTj7vMWWhUzrdKCAOjx_VPUqKqon0XMfz6dhDmOljYbLA8eJEgGJ0sybGgzTmE59X9L4Gu17Ymv-nafQKHpPvdVHKage52KYnvuWT1xa7iS1RN8i6nOlZuBG1bD1bsgVLDEqI9wLhKxEY5qj-ydVAcjOrDDzWli5oKdPLP66NS7swQy0EB0Jy8So-RWmS-92nQMd2gQ_uzXRXFcU3d0Um5vX7K',
-    quote:
-      'Hundreds less than the body shop quote and done in an afternoon. Highly professional tech.',
-    author: 'David T.',
-    initials: 'DT',
-  },
-]
+  /** Sample tracker codes already shipped with this demo. */
+  sampleJobs: ['PF-2481', 'PF-7752', 'PF-1039'],
 
-const REVIEWS = [
-  {
-    quote:
-      'Incredible service. They fixed a deep scratch on my Tesla right in my driveway. The colour match is flawless and it saved me days without the car.',
-    author: 'Michael T.',
-    location: 'MISSISSAUGA, ON',
-    vehicle: 'TESLA MODEL 3',
-  },
-  {
-    quote:
-      'Professional from start to finish. The tech was meticulous and treated my Porsche with real care. The bumper looks brand new.',
-    author: 'Sarah J.',
-    location: 'OAKVILLE, ON',
-    vehicle: 'PORSCHE MACAN',
-  },
-]
+  pages: [
+    { path: '/', label: 'Home' },
+    { path: '/services', label: 'Services' },
+    { path: '/gallery', label: 'Gallery' },
+    { path: '/about', label: 'About' },
+    { path: '/reviews', label: 'Reviews' },
+    { path: '/faq', label: 'FAQ' },
+    { path: '/contact', label: 'Contact' },
+  ],
 
-const NAV_LINKS = [
-  { href: '#services', label: 'Services' },
-  { href: '#process', label: 'Process' },
-  { href: '#work', label: 'Work' },
-  { href: '#reviews', label: 'Reviews' },
-  { href: '#quote', label: 'Quote' },
-]
-
-const PHONE = '(416) 627-3948'
-const PHONE_HREF = 'tel:4166273948'
-const ADDRESS = '6545 Cedar Rapids Crescent, Mississauga, ON'
+  seo: {
+    home: {
+      title: 'Paint Force — Mobile paint and scratch repair in Mississauga',
+      description:
+        'Paint Force offers mobile scratch removal, paint touch-up, and bumper repair in Mississauga, Ontario. Request a quote or call (416) 627-3948. 6545 Cedar Rapids Crescent.',
+    },
+    services: {
+      title: 'Scratch, touch-up, and bumper repair | Paint Force, Mississauga',
+      description:
+        'Price list for Paint Force in Mississauga: scratch removal, VIN-matched paint touch-up, and bumper repair. Prices shown are placeholders until confirmed.',
+    },
+    gallery: {
+      title: 'Paint repair gallery | Paint Force, Mississauga',
+      description:
+        'Before-and-after paint repair examples for Paint Force in Mississauga. Photos are illustrative stand-ins until the studio’s own photography is added.',
+    },
+    about: {
+      title: 'About Paint Force | Mobile paint repair in Mississauga',
+      description:
+        'Paint Force finishes paint and scratch repair on site from 6545 Cedar Rapids Crescent, Mississauga. See how a visit is booked and what to confirm before launch.',
+    },
+    reviews: {
+      title: 'Reviews | Paint Force, Mississauga',
+      description:
+        'Sample testimonials for the Paint Force demo, plus a placeholder button for a Google review link. Replace the samples with reviews you have permission to publish.',
+    },
+    faq: {
+      title: 'FAQ | Paint Force mobile paint repair, Mississauga',
+      description:
+        'Answers about Paint Force mobile scratch removal, paint touch-up, and bumper repair in Mississauga, including the quote form, hours placeholder, and repair tracker.',
+    },
+    contact: {
+      title: 'Quote, map, and hours | Paint Force, Mississauga',
+      description:
+        'Request a Paint Force quote in Mississauga, see the map for 6545 Cedar Rapids Crescent, and review placeholder hours. Call (416) 627-3948.',
+    },
+  },
+}
 
 /* ===== src/lib/api.js ===== */
 /**
@@ -679,6 +947,38 @@ function formatPhone(value) {
   return `(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6)}`
 }
 
+/* ===== src/lib/asset.js ===== */
+/**
+ * Public-folder paths under the Vite `base` (GitHub Pages project site).
+ * `'/'` is `/` in local preview.html and `/paint-force-inc/`
+ * in the Pages build.
+ */
+function publicUrl(path) {
+  if (!path || /^(https?:)?\/\//.test(path) || path.startsWith('data:')) return path
+  const base = '/' || '/'
+  return `${base}${String(path).replace(/^\//, '')}`
+}
+
+/** App route (`/gallery`) from a browser pathname that includes the base. */
+function appPath(pathname) {
+  const base = ('/' || '/').replace(/\/$/, '')
+  let bare = String(pathname || '/').split('?')[0].split('#')[0]
+  if (base && (bare === base || bare.startsWith(`${base}/`))) {
+    bare = bare.slice(base.length) || '/'
+  }
+  if (!bare.startsWith('/')) bare = `/${bare}`
+  if (bare.length > 1 && bare.endsWith('/')) bare = bare.slice(0, -1)
+  return bare || '/'
+}
+
+/** Browser href for an app route, including the Pages subpath. */
+function appHref(to) {
+  const next = appPath(to)
+  const base = ('/' || '/').replace(/\/$/, '')
+  if (next === '/') return base ? `${base}/` : '/'
+  return `${base}${next}`
+}
+
 /* ===== src/lib/hooks.js ===== */
 /** Adds .is-visible once an element scrolls into view. One-shot: no replay on
  *  scroll-up, which reads as twitchy on a long page. */
@@ -762,6 +1062,122 @@ function useBodyLock(locked) {
       document.body.style.paddingRight = paddingRight
     }
   }, [locked])
+}
+
+/** Reads the OS motion preference on the first render so nothing flashes. */
+function useReducedMotion() {
+  const [reduce, setReduce] = useState(() =>
+    typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  )
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const onChange = () => setReduce(mq.matches)
+    mq.addEventListener('change', onChange)
+    return () => mq.removeEventListener('change', onChange)
+  }, [])
+  return reduce
+}
+
+/**
+ * Slow vertical drift for a hero image. Transform only, so the layout box
+ * never moves. Skipped on small screens and when reduced motion is requested.
+ */
+function useParallax(ref, speed = 0.08) {
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const desktop = window.matchMedia('(min-width: 768px)')
+    let raf = 0
+
+    const paint = () => {
+      const y = Math.min(window.scrollY, window.innerHeight) * speed
+      el.style.transform = `translate3d(0, ${y.toFixed(2)}px, 0)`
+    }
+
+    const onScroll = () => {
+      if (reduce.matches || !desktop.matches) {
+        el.style.transform = ''
+        return
+      }
+      cancelAnimationFrame(raf)
+      raf = requestAnimationFrame(paint)
+    }
+
+    paint()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    reduce.addEventListener('change', onScroll)
+    desktop.addEventListener('change', onScroll)
+    return () => {
+      cancelAnimationFrame(raf)
+      window.removeEventListener('scroll', onScroll)
+      reduce.removeEventListener('change', onScroll)
+      desktop.removeEventListener('change', onScroll)
+      el.style.transform = ''
+    }
+  }, [speed])
+}
+
+function usePageMeta(title, description) {
+  useEffect(() => {
+    if (title) document.title = title
+    if (!description) return
+    const el = document.querySelector('meta[name="description"]')
+    if (el) el.setAttribute('content', description)
+  }, [title, description])
+}
+
+/* ===== src/lib/router.jsx ===== */
+/**
+ * pushState plus a listener set. Routes stay root-shaped (`/gallery`);
+ * the browser path includes the Vite base so GitHub Pages project sites work.
+ */
+const listeners = new Set()
+
+function normalizePath(path) {
+  return appPath(path)
+}
+
+{ appHref }
+
+function navigate(to) {
+  const next = appPath(to)
+  if (next !== appPath(window.location.pathname)) {
+    window.history.pushState({}, '', appHref(next))
+    listeners.forEach((l) => l())
+  }
+  window.scrollTo(0, 0)
+}
+
+function useRoute() {
+  const [path, setPath] = useState(() => appPath(window.location.pathname))
+  useEffect(() => {
+    const onChange = () => setPath(appPath(window.location.pathname))
+    listeners.add(onChange)
+    window.addEventListener('popstate', onChange)
+    return () => {
+      listeners.delete(onChange)
+      window.removeEventListener('popstate', onChange)
+    }
+  }, [])
+  return path
+}
+
+function Link({ to, onClick, children, ...rest }) {
+  return (
+    <a
+      href={appHref(to)}
+      onClick={(e) => {
+        onClick?.(e)
+        if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
+        e.preventDefault()
+        navigate(to)
+      }}
+      {...rest}
+    >
+      {children}
+    </a>
+  )
 }
 
 /* ===== src/components/Icon.jsx ===== */
@@ -936,7 +1352,7 @@ function Spinner({ size = 16, className = '' }) {
  * leaving a broken-image glyph on a dark page, a failed load falls back to a
  * tonal panel that still reads as part of the layout.
  */
-function SmartImage({ src, alt, className = '', style, label, ...rest }) {
+function SmartImage({ src, alt, className = '', style, label, priority = false, ...rest }) {
   const [failed, setFailed] = useState(false)
 
   if (failed) {
@@ -959,7 +1375,9 @@ function SmartImage({ src, alt, className = '', style, label, ...rest }) {
     <img
       alt={alt}
       className={className}
-      loading="lazy"
+      decoding="async"
+      fetchPriority={priority ? 'high' : 'auto'}
+      loading={priority ? 'eager' : 'lazy'}
       onError={() => setFailed(true)}
       src={src}
       style={style}
@@ -1113,153 +1531,144 @@ function Modal({ open, onClose, label, children, width = 'max-w-3xl' }) {
   )
 }
 
+/* ===== src/components/Badges.jsx ===== */
+function Placeholder({ children = 'Placeholder' }) {
+  return <span className="chip badge-placeholder">{children}</span>
+}
+
+function Illustrative({ className = '' }) {
+  return <span className={`chip badge-illustrative ${className}`}>Illustrative</span>
+}
+
 /* ===== src/components/BeforeAfter.jsx ===== */
 /**
- * Before/after comparison slider.
- *
- * Two source shapes are supported:
- *
- *   <BeforeAfter before="/damaged.jpg" after="/repaired.jpg" />
- *   <BeforeAfter src="/pair.jpg" composite />
- *
- * `composite` handles the portfolio photography from the design export, which
- * ships each pair as one side-by-side file — damaged on the left, finished on
- * the right. Each half is cropped out of the same source instead of needing
- * two requests.
- *
- * The handle is a real slider: drag it, or focus it and use the arrow keys.
+ * Drag, click, or arrow-key comparison. Composite files are side-by-side
+ * before | after shots, so each half is cropped to fill the frame.
  */
-function BeforeAfter({ before, after, src, composite = false, alt = '', className = '' }) {
-  const [pos, setPos] = useState(52) // start just off-centre so it reads as movable
-  const [dragging, setDragging] = useState(false)
-  const frame = useRef(null)
-
-  const setFromClientX = useCallback((clientX) => {
-    const box = frame.current?.getBoundingClientRect()
-    if (!box) return
-    const next = ((clientX - box.left) / box.width) * 100
-    setPos(Math.min(100, Math.max(0, next)))
-  }, [])
+function BeforeAfter({ src, alt = '', className = '' }) {
+  const box = useRef(null)
+  const [pos, setPos] = useState(58)
+  const [width, setWidth] = useState(0)
+  const [failed, setFailed] = useState(false)
 
   useEffect(() => {
-    if (!dragging) return
-    const move = (e) => {
-      e.preventDefault()
-      setFromClientX(e.touches ? e.touches[0].clientX : e.clientX)
-    }
-    const stop = () => setDragging(false)
-    window.addEventListener('mousemove', move)
-    window.addEventListener('mouseup', stop)
-    window.addEventListener('touchmove', move, { passive: false })
-    window.addEventListener('touchend', stop)
-    return () => {
-      window.removeEventListener('mousemove', move)
-      window.removeEventListener('mouseup', stop)
-      window.removeEventListener('touchmove', move)
-      window.removeEventListener('touchend', stop)
-    }
-  }, [dragging, setFromClientX])
+    const el = box.current
+    if (!el || failed) return
+    const measure = () => setWidth(el.clientWidth)
+    measure()
+    const ro = new ResizeObserver(measure)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [failed])
 
-  const onKeyDown = (e) => {
-    const step = e.shiftKey ? 10 : 3
-    if (e.key === 'ArrowLeft') setPos((p) => Math.max(0, p - step))
-    else if (e.key === 'ArrowRight') setPos((p) => Math.min(100, p + step))
-    else if (e.key === 'Home') setPos(0)
-    else if (e.key === 'End') setPos(100)
-    else return
-    e.preventDefault()
+  const setFromX = (clientX) => {
+    const rect = box.current?.getBoundingClientRect()
+    if (!rect?.width) return
+    const next = ((clientX - rect.left) / rect.width) * 100
+    setPos(Math.min(94, Math.max(6, next)))
   }
 
-  // In composite mode each layer renders the source at 2x width and slides it
-  // so the correct half fills the frame.
-  const layerImg = (side) =>
-    composite
-      ? { src, style: { width: '200%', height: '100%', objectFit: 'cover', marginLeft: side === 'after' ? '-100%' : 0 } }
-      : { src: side === 'after' ? after : before, style: { width: '100%', height: '100%', objectFit: 'cover' } }
+  const onKey = (e) => {
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault()
+      setPos((p) => Math.max(6, p - 4))
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault()
+      setPos((p) => Math.min(94, p + 4))
+    }
+  }
 
-  const afterLayer = layerImg('after')
-  const beforeLayer = layerImg('before')
+  if (failed || !src) {
+    return (
+      <div
+        aria-label={alt || 'Illustrative photo unavailable'}
+        className={`s-container relative flex items-center justify-center ${className}`}
+        role="img"
+      >
+        <span className="t-caps c-variant px-4 text-center text-[10px] opacity-70">
+          Illustrative photo unavailable
+        </span>
+      </div>
+    )
+  }
 
   return (
     <div
-      ref={frame}
-      className={`relative select-none overflow-hidden ${className}`}
-      onMouseDown={(e) => {
-        setDragging(true)
-        setFromClientX(e.clientX)
+      aria-label={alt}
+      className={`relative touch-none select-none overflow-hidden ${className}`}
+      onPointerDown={(e) => {
+        if (e.button !== 0) return
+        e.currentTarget.setPointerCapture(e.pointerId)
+        setFromX(e.clientX)
       }}
-      onTouchStart={(e) => {
-        setDragging(true)
-        setFromClientX(e.touches[0].clientX)
+      onPointerMove={(e) => {
+        if (!e.currentTarget.hasPointerCapture(e.pointerId)) return
+        setFromX(e.clientX)
       }}
-      style={{ cursor: dragging ? 'ew-resize' : 'pointer', touchAction: 'pan-y' }}
+      ref={box}
+      role="group"
     >
-      {/* Repaired state sits underneath and is revealed as the handle moves left */}
-      <div className="absolute inset-0 overflow-hidden">
-        <SmartImage alt={`${alt} after repair`} label="AFTER" {...afterLayer} draggable={false} />
-      </div>
-
-      {/* Damaged state clipped to the handle position */}
+      <img
+        alt=""
+        className="pointer-events-none absolute h-px w-px opacity-0"
+        onError={() => setFailed(true)}
+        src={src}
+      />
       <div
-        className="absolute inset-0 overflow-hidden"
-        style={{ clipPath: `inset(0 ${100 - pos}% 0 0)` }}
-      >
-        <SmartImage alt={`${alt} before repair`} label="BEFORE" {...beforeLayer} draggable={false} />
+        aria-hidden="true"
+        className="absolute inset-0"
+        style={{
+          backgroundImage: `url("${src}")`,
+          backgroundPosition: 'right center',
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: '200% 100%',
+        }}
+      />
+      <div className="absolute inset-y-0 left-0 overflow-hidden" style={{ width: `${pos}%` }}>
+        <div
+          className="absolute inset-y-0 left-0 h-full"
+          style={{
+            width: width ? `${width}px` : '100%',
+            backgroundImage: `url("${src}")`,
+            backgroundPosition: 'left center',
+            backgroundRepeat: 'no-repeat',
+            backgroundSize: width ? `${width * 2}px 100%` : '200% 100%',
+          }}
+        />
       </div>
 
       <span
-        className="t-caps pointer-events-none absolute left-3 top-3 rounded-sm px-2 py-1 text-[10px] transition-opacity"
-        style={{
-          background: 'rgba(11,15,18,.72)',
-          color: 'var(--on-surface)',
-          backdropFilter: 'blur(4px)',
-          opacity: pos > 18 ? 1 : 0,
-        }}
+        className="t-caps pointer-events-none absolute left-3 top-3 rounded-sm px-2 py-1 text-[10px]"
+        style={{ background: 'rgba(11,15,18,.72)', color: 'var(--on-surface)' }}
       >
         Before
       </span>
       <span
-        className="t-caps pointer-events-none absolute right-3 top-3 rounded-sm px-2 py-1 text-[10px] transition-opacity"
-        style={{
-          background: 'rgba(11,15,18,.72)',
-          color: 'var(--primary)',
-          backdropFilter: 'blur(4px)',
-          opacity: pos < 82 ? 1 : 0,
-        }}
+        className="t-caps pointer-events-none absolute right-3 top-3 rounded-sm px-2 py-1 text-[10px]"
+        style={{ background: 'rgba(11,15,18,.72)', color: 'var(--primary)' }}
       >
         After
       </span>
+      <span className="chip badge-illustrative pointer-events-none absolute bottom-3 left-3">Illustrative</span>
 
-      {/* Silver vertical handle, per the brief */}
       <div
-        aria-label={`Reveal repair — ${Math.round(pos)}% before`}
-        aria-orientation="horizontal"
+        aria-label="Compare before and after"
         aria-valuemax={100}
         aria-valuemin={0}
         aria-valuenow={Math.round(pos)}
-        className="absolute inset-y-0 z-10 w-px"
-        onKeyDown={onKeyDown}
+        aria-valuetext={`${Math.round(pos)} percent across the repair`}
+        className="absolute inset-y-0 z-10 w-11 -translate-x-1/2 cursor-ew-resize focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+        onKeyDown={onKey}
         role="slider"
-        style={{
-          left: `${pos}%`,
-          background: 'var(--secondary)',
-          boxShadow: '0 0 12px rgba(0,0,0,.6)',
-        }}
+        style={{ left: `${pos}%` }}
         tabIndex={0}
       >
+        <span className="absolute inset-y-0 left-1/2 w-0.5 -translate-x-1/2 bg-white" />
         <span
           className="absolute left-1/2 top-1/2 flex h-9 w-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full"
-          style={{
-            background: 'var(--secondary)',
-            color: '#101417',
-            boxShadow: '0 2px 10px rgba(0,0,0,.55)',
-            transform: `translate(-50%,-50%) scale(${dragging ? 1.1 : 1})`,
-            transition: 'transform .15s ease',
-          }}
+          style={{ background: '#fff', color: '#1c2024' }}
         >
-          <svg fill="none" height="14" stroke="currentColor" strokeLinecap="round" strokeWidth="2" viewBox="0 0 24 24" width="14">
-            <path d="m10 7-5 5 5 5M14 7l5 5-5 5" />
-          </svg>
+          <Icon name="sliders" size={16} />
         </span>
       </div>
     </div>
@@ -1286,14 +1695,613 @@ function SectionHead({ eyebrow, title, lead, center = false, className = '' }) {
   )
 }
 
-/* ===== src/components/Nav.jsx ===== */
-const SECTION_IDS = NAV_LINKS.map((l) => l.href.slice(1))
+/* ===== src/components/Tilt.jsx ===== */
+/** Pointer tilt for fine pointers. The transform stays on this wrapper so it
+ *  never fights a scroll-reveal transform on the parent, and it does not
+ *  change the layout box. */
+function Tilt({ children, className = '' }) {
+  const ref = useRef(null)
+  const reduce = useReducedMotion()
 
+  const onMove = (e) => {
+    if (reduce || window.matchMedia('(pointer: coarse)').matches) return
+    const el = ref.current
+    if (!el) return
+    const r = el.getBoundingClientRect()
+    const x = (e.clientX - r.left) / r.width - 0.5
+    const y = (e.clientY - r.top) / r.height - 0.5
+    el.style.transform = `perspective(900px) rotateX(${(-y * 5).toFixed(2)}deg) rotateY(${(x * 6).toFixed(2)}deg)`
+  }
+
+  const reset = () => {
+    if (ref.current) ref.current.style.transform = ''
+  }
+
+  return (
+    <div className={className} onPointerLeave={reset} onPointerMove={onMove} ref={ref} style={{ transition: reduce ? 'none' : 'transform .16s ease-out' }}>
+      {children}
+    </div>
+  )
+}
+
+/* ===== src/components/Counter.jsx ===== */
+function Counter({ value, label, note }) {
+  const ref = useRef(null)
+  const reduce = useReducedMotion()
+  const [n, setN] = useState(reduce ? value : 0)
+
+  useEffect(() => {
+    if (reduce) {
+      setN(value)
+      return
+    }
+    const el = ref.current
+    if (!el) return
+    let raf = 0
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return
+        io.disconnect()
+        const start = performance.now()
+        const tick = (now) => {
+          const t = Math.min(1, (now - start) / 900)
+          const eased = 1 - Math.pow(1 - t, 3)
+          setN(Math.round(value * eased))
+          if (t < 1) raf = requestAnimationFrame(tick)
+        }
+        raf = requestAnimationFrame(tick)
+      },
+      { threshold: 0.45 }
+    )
+    io.observe(el)
+    return () => {
+      io.disconnect()
+      cancelAnimationFrame(raf)
+    }
+  }, [reduce, value])
+
+  return (
+    <div ref={ref}>
+      <span
+        className="t-display c-on tabular inline-block"
+        style={{ minWidth: `${String(value).length}ch` }}
+      >
+        {n}
+      </span>
+      <span className="t-h3 c-on mt-2 block">{label}</span>
+      {note && <span className="t-caps c-variant mt-2 block text-[10px] opacity-60">{note}</span>}
+    </div>
+  )
+}
+
+/* ===== src/components/GoogleReviewButton.jsx ===== */
+function GoogleReviewButton({ className = '' }) {
+  const url = site.business.googleReviewUrl
+  const label = (
+    <>
+      <Stars size={12} />
+      Leave us a Google review
+    </>
+  )
+
+  if (!url) {
+    return (
+      <span className={`inline-flex flex-col items-start gap-2 ${className}`}>
+        <span className="btn btn-ghost px-5 py-3">{label}</span>
+        <Placeholder>Placeholder link</Placeholder>
+      </span>
+    )
+  }
+
+  return (
+    <a className={`btn btn-ghost px-5 py-3 ${className}`} href={url} rel="noreferrer" target="_blank">
+      {label}
+    </a>
+  )
+}
+
+/* ===== src/components/MapEmbed.jsx ===== */
+function MapEmbed() {
+  const query = encodeURIComponent(site.business.address)
+  return (
+    <div className="card overflow-hidden">
+      <div className="relative aspect-[4/3] min-h-[260px] w-full bg-[var(--surface-container)]">
+        <iframe
+          className="absolute inset-0 h-full w-full border-0"
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+          src={`https://maps.google.com/maps?q=${query}&z=15&output=embed`}
+          title={`Map of ${site.business.address}`}
+        />
+      </div>
+      <p className="t-caps c-variant px-4 py-3 text-[10px] opacity-70">
+        Pin shows the street address on file.
+      </p>
+    </div>
+  )
+}
+
+/* ===== src/components/PageHero.jsx ===== */
+function PageHero({ eyebrow, title, lead }) {
+  const ref = useReveal()
+  return (
+    <header className="hairline-b">
+      <div className="reveal mx-auto max-w-container px-gutter py-12 md:py-16" ref={ref}>
+        <div className="flex items-center gap-3">
+          <span className="h-px w-6 shrink-0" style={{ background: 'var(--primary-container)' }} />
+          <p className="t-caps c-primary">{eyebrow}</p>
+        </div>
+        <h1 className="t-h1 c-on mt-4 max-w-3xl">{title}</h1>
+        {lead && <p className="t-body-lg c-variant mt-4 max-w-2xl">{lead}</p>}
+      </div>
+    </header>
+  )
+}
+
+/* ===== src/components/DemoBanner.jsx ===== */
+function DemoBanner() {
+  if (!site.demo.show) return null
+  return (
+    <div className="demo-banner" role="note">
+      <span className="t-caps text-[10px]">{site.demo.label}</span>
+      <span className="hidden text-[12.5px] leading-none sm:inline">{site.demo.message}</span>
+      <span className="truncate text-[12px] leading-none sm:hidden">Northpage Premium sample</span>
+    </div>
+  )
+}
+
+/* ===== src/components/HeroScrub.jsx ===== */
+const VIDEO_SRC = publicUrl('/hero-video/painter-turn-720p-intra.mp4')
+const POSTER_SRC = publicUrl('/hero-video/poster.jpg')
+const FRAME_COUNT = 30
+const DURATION_FALLBACK = 3
+
+const clamp = (n, a, b) => Math.min(b, Math.max(a, n))
+
+function frameSrc(index) {
+  return publicUrl(`/hero-video/frames/frame-${String(index + 1).padStart(3, '0')}.jpg`)
+}
+
+function drawCover(ctx, img, width, height) {
+  const ir = img.naturalWidth / img.naturalHeight
+  const cr = width / height
+  let dw
+  let dh
+  let dx
+  let dy
+  if (ir > cr) {
+    dh = height
+    dw = height * ir
+    dx = (width - dw) / 2
+    dy = 0
+  } else {
+    dw = width
+    dh = width / ir
+    dx = 0
+    dy = (height - dh) / 2
+  }
+  ctx.drawImage(img, dx, dy, dw, dh)
+}
+
+/**
+ * Cursor-scrubbed hero. The clip does not autoplay: pointer X maps to
+ * currentTime through a smoothed animation frame. Touch uses scroll while
+ * the finger is moving, then a slow ping-pong. If seeking never lands,
+ * the 30 stills are drawn on a canvas instead.
+ */
+function HeroScrub() {
+  const root = useRef(null)
+  const videoRef = useRef(null)
+  const canvasRef = useRef(null)
+  const reduce = useReducedMotion()
+  const [engine, setEngine] = useState('poster')
+
+  useEffect(() => {
+    if (reduce) return undefined
+    const rootEl = root.current
+    const video = videoRef.current
+    if (!rootEl || !video) return undefined
+
+    let dead = false
+    let raf = 0
+    let target = 0
+    let shown = 0
+    let duration = DURATION_FALLBACK
+    let mode = 'video'
+    let frames = []
+    let lastIndex = -1
+    let ping = 0
+    let pingDir = 1
+    let lastTs = 0
+    let scrolling = false
+    let scrollTimer = 0
+    const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches
+
+    const resizeCanvas = () => {
+      const canvas = canvasRef.current
+      if (!canvas) return null
+      const dpr = Math.min(window.devicePixelRatio || 1, 2)
+      const width = rootEl.clientWidth
+      const height = rootEl.clientHeight
+      const nextW = Math.max(1, Math.round(width * dpr))
+      const nextH = Math.max(1, Math.round(height * dpr))
+      if (canvas.width !== nextW || canvas.height !== nextH) {
+        canvas.width = nextW
+        canvas.height = nextH
+        lastIndex = -1
+      }
+      const ctx = canvas.getContext('2d')
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+      return { ctx, width, height }
+    }
+
+    const drawFrame = (time) => {
+      if (!frames.length) return
+      const surface = resizeCanvas()
+      if (!surface) return
+      const idx = clamp(Math.round((time / duration) * (frames.length - 1)), 0, frames.length - 1)
+      let use = -1
+      if (frames[idx]?.complete && frames[idx].naturalWidth) use = idx
+      else {
+        for (let d = 1; d < frames.length; d += 1) {
+          if (frames[idx - d]?.complete && frames[idx - d].naturalWidth) {
+            use = idx - d
+            break
+          }
+          if (frames[idx + d]?.complete && frames[idx + d].naturalWidth) {
+            use = idx + d
+            break
+          }
+        }
+      }
+      if (use < 0 || use === lastIndex) return
+      lastIndex = use
+      surface.ctx.clearRect(0, 0, surface.width, surface.height)
+      drawCover(surface.ctx, frames[use], surface.width, surface.height)
+    }
+
+    const useFrames = () => {
+      if (mode === 'frames' || dead) return
+      mode = 'frames'
+      if (!frames.length) {
+        frames = Array.from({ length: FRAME_COUNT }, (_, i) => {
+          const img = new Image()
+          img.decoding = 'async'
+          img.src = frameSrc(i)
+          return img
+        })
+      }
+      try {
+        video.pause()
+        video.removeAttribute('src')
+        video.load()
+      } catch {
+        /* the stills take over */
+      }
+      setEngine('frames')
+    }
+
+    const apply = (time) => {
+      if (mode === 'frames') {
+        drawFrame(time)
+        return
+      }
+      if (Math.abs(video.currentTime - time) < 1 / 30) return
+      try {
+        video.currentTime = time
+      } catch {
+        useFrames()
+      }
+    }
+
+    const loop = (ts) => {
+      if (dead) return
+      const dt = lastTs ? Math.min(0.05, (ts - lastTs) / 1000) : 0.016
+      lastTs = ts
+      const rect = rootEl.getBoundingClientRect()
+      const near = rect.bottom > -80 && rect.top < window.innerHeight + 80
+      if (!fine && near && !scrolling) {
+        ping += pingDir * dt * 0.42
+        if (ping >= duration) {
+          ping = duration
+          pingDir = -1
+        } else if (ping <= 0) {
+          ping = 0
+          pingDir = 1
+        }
+        target = ping
+      }
+      if (near) {
+        shown += (target - shown) * 0.18
+        if (Math.abs(target - shown) < 0.012) shown = target
+        apply(shown)
+      }
+      raf = requestAnimationFrame(loop)
+    }
+
+    const onMove = (e) => {
+      if (!fine || e.pointerType === 'touch') return
+      target = clamp(e.clientX / window.innerWidth, 0, 1) * duration
+    }
+
+    const onScroll = () => {
+      if (fine) return
+      scrolling = true
+      window.clearTimeout(scrollTimer)
+      scrollTimer = window.setTimeout(() => {
+        scrolling = false
+      }, 240)
+      const rect = rootEl.getBoundingClientRect()
+      const total = window.innerHeight + rect.height
+      const progress = clamp((window.innerHeight - rect.top) / total, 0, 1)
+      target = progress * duration
+      ping = target
+    }
+
+    const probeSeek = () =>
+      new Promise((resolve) => {
+        const want = Math.min(1.15, duration * 0.4)
+        let settled = false
+        const finish = (ok) => {
+          if (settled) return
+          settled = true
+          video.removeEventListener('seeked', onSeeked)
+          resolve(ok)
+        }
+        const onSeeked = () => finish(Math.abs(video.currentTime - want) < 0.35)
+        video.addEventListener('seeked', onSeeked)
+        try {
+          video.currentTime = want
+        } catch {
+          finish(false)
+        }
+        window.setTimeout(() => finish(false), 1200)
+      })
+
+    const start = async () => {
+      video.muted = true
+      video.defaultMuted = true
+      video.playsInline = true
+      video.preload = 'auto'
+      video.src = VIDEO_SRC
+      video.pause()
+      try {
+        await Promise.race([
+          new Promise((resolve, reject) => {
+            const ok = () => resolve()
+            const bad = () => reject()
+            video.addEventListener('loadeddata', ok, { once: true })
+            video.addEventListener('error', bad, { once: true })
+          }),
+          new Promise((_, reject) => {
+            window.setTimeout(() => reject(new Error('slow')), 4000)
+          }),
+        ])
+      } catch {
+        if (!dead) useFrames()
+        raf = requestAnimationFrame(loop)
+        return
+      }
+      if (dead) return
+      if (!Number.isFinite(video.duration) || video.duration <= 0) {
+        useFrames()
+      } else {
+        duration = video.duration
+        const reliable = await probeSeek()
+        if (dead) return
+        if (!reliable) useFrames()
+        else {
+          try {
+            video.currentTime = 0
+          } catch {
+            /* first frame is the poster */
+          }
+          await new Promise((resolve) => {
+            if (video.currentTime < 0.08) {
+              resolve()
+              return
+            }
+            const finish = () => resolve()
+            video.addEventListener('seeked', finish, { once: true })
+            window.setTimeout(finish, 400)
+          })
+          if (dead) return
+          shown = 0
+          target = 0
+          mode = 'video'
+          setEngine('video')
+        }
+      }
+      raf = requestAnimationFrame(loop)
+    }
+
+    window.addEventListener('pointermove', onMove, { passive: true })
+    window.addEventListener('scroll', onScroll, { passive: true })
+    start()
+
+    return () => {
+      dead = true
+      cancelAnimationFrame(raf)
+      window.clearTimeout(scrollTimer)
+      window.removeEventListener('pointermove', onMove)
+      window.removeEventListener('scroll', onScroll)
+      try {
+        video.pause()
+        video.removeAttribute('src')
+        video.load()
+      } catch {
+        /* unmount */
+      }
+    }
+  }, [reduce])
+
+  return (
+    <div className="absolute inset-0" ref={root}>
+      <img
+        alt=""
+        className="absolute inset-0 h-full w-full object-cover"
+        decoding="async"
+        draggable={false}
+        fetchPriority="high"
+        src={POSTER_SRC}
+        style={{ opacity: engine === 'poster' ? 1 : 0 }}
+      />
+      <video
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+        muted
+        playsInline
+        poster={POSTER_SRC}
+        preload={reduce ? 'none' : 'auto'}
+        ref={videoRef}
+        style={{ opacity: engine === 'video' ? 1 : 0 }}
+        tabIndex={-1}
+      />
+      <canvas
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 h-full w-full"
+        ref={canvasRef}
+        style={{ opacity: engine === 'frames' ? 1 : 0 }}
+      />
+    </div>
+  )
+}
+
+/* ===== src/components/PaintRoom.jsx ===== */
+const clamp = (n, a, b) => Math.min(b, Math.max(a, n))
+
+function SceneImage({ base, fallback }) {
+  return (
+    <picture className="pointer-events-none absolute inset-0 block h-full w-full">
+      <source media="(max-width: 767px)" srcSet={publicUrl(`/scroll-scene/mobile/${base}.webp`)} type="image/webp" />
+      <source media="(max-width: 767px)" srcSet={publicUrl(`/scroll-scene/mobile/${base}.${fallback}`)} />
+      <source srcSet={publicUrl(`/scroll-scene/desktop/${base}.webp`)} type="image/webp" />
+      <img
+        alt=""
+        className="absolute inset-0 h-full w-full object-cover"
+        decoding="async"
+        draggable={false}
+        src={publicUrl(`/scroll-scene/desktop/${base}.${fallback}`)}
+      />
+    </picture>
+  )
+}
+
+/**
+ * Pinned 200vh scene. Primer stays put, the painted wall wipes on like a
+ * roller, the sofa lags at 0.6×, and the foreground props drift outward.
+ * Reduced motion renders the finished room at its natural height.
+ */
+function PaintRoom() {
+  const reduce = useReducedMotion()
+  const sectionRef = useRef(null)
+  const pinRef = useRef(null)
+  const wipeRef = useRef(null)
+  const sofaRef = useRef(null)
+  const leftRef = useRef(null)
+  const rightRef = useRef(null)
+  const lineRef = useRef(null)
+
+  useEffect(() => {
+    if (reduce) return undefined
+    const section = sectionRef.current
+    const pin = pinRef.current
+    if (!section || !pin) return undefined
+
+    let raf = 0
+    const paint = () => {
+      const header = Number.parseFloat(
+        getComputedStyle(document.documentElement).getPropertyValue('--header-h')
+      ) || 0
+      const top = section.getBoundingClientRect().top
+      const travel = section.offsetHeight - pin.offsetHeight
+      const progress = travel > 0 ? clamp((header - top) / travel, 0, 1) : 1
+      const unit = Math.min(window.innerHeight * 0.1, 96)
+      if (wipeRef.current) {
+        wipeRef.current.style.clipPath = `inset(0 ${(1 - progress) * 100}% 0 0)`
+      }
+      if (sofaRef.current) {
+        sofaRef.current.style.transform = `translate3d(0, ${(progress * unit * 0.6).toFixed(2)}px, 0)`
+      }
+      if (leftRef.current) {
+        leftRef.current.style.transform = `translate3d(${(-progress * unit * 1.25).toFixed(2)}px, ${(progress * unit * 0.2).toFixed(2)}px, 0)`
+      }
+      if (rightRef.current) {
+        rightRef.current.style.transform = `translate3d(${(progress * unit * 1.4).toFixed(2)}px, ${(progress * unit * 0.15).toFixed(2)}px, 0)`
+      }
+      if (lineRef.current) lineRef.current.style.opacity = String(0.35 + progress * 0.65)
+    }
+
+    const onScroll = () => {
+      cancelAnimationFrame(raf)
+      raf = requestAnimationFrame(paint)
+    }
+
+    paint()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onScroll, { passive: true })
+    return () => {
+      cancelAnimationFrame(raf)
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
+    }
+  }, [reduce])
+
+  return (
+    <section
+      aria-label="Illustrative paint study"
+      className="paint-track relative h-[200vh]"
+      ref={sectionRef}
+    >
+      <div
+        className="paint-pin sticky z-0 overflow-hidden"
+        ref={pinRef}
+        style={{ top: 'var(--header-h)', height: 'calc(100svh - var(--header-h))' }}
+      >
+        <SceneImage base="bg-wall-primer" fallback="jpg" />
+        <div className="paint-wipe pointer-events-none absolute inset-0" ref={wipeRef}>
+          <SceneImage base="bg-wall-painted" fallback="jpg" />
+        </div>
+        <div className="paint-layer pointer-events-none absolute inset-0" ref={sofaRef}>
+          <SceneImage base="mid-sofa" fallback="png" />
+        </div>
+        <div className="paint-layer pointer-events-none absolute inset-0" ref={leftRef}>
+          <SceneImage base="fg-left" fallback="png" />
+        </div>
+        <div className="paint-layer pointer-events-none absolute inset-0" ref={rightRef}>
+          <SceneImage base="fg-right" fallback="png" />
+        </div>
+
+        <div className="pointer-events-none absolute inset-0 z-10 flex items-end px-gutter pb-24 md:items-center md:pb-16">
+          <div className="max-w-xl">
+            <p className="t-caps c-primary">Motion study</p>
+            <h2 className="t-h1 c-on mt-3">
+              <span className="block">From bare walls</span>
+              <span className="c-primary mt-1 block" ref={lineRef} style={{ opacity: reduce ? 1 : 0.35 }}>
+                to a finished room.
+              </span>
+            </h2>
+          </div>
+        </div>
+
+        <p className="chip badge-illustrative chip-wrap pointer-events-none absolute left-3 top-3 z-20 max-w-[16rem] sm:bottom-4 sm:left-6 sm:top-auto sm:max-w-xs">
+          Illustrative image, not a photo of Paint Force&apos;s work
+        </p>
+      </div>
+    </section>
+  )
+}
+
+/* ===== src/components/Nav.jsx ===== */
 function Nav({ onBook, onTrack }) {
   const [open, setOpen] = useState(false)
-  const scrolled = useScrolled(20)
-  const active = useActiveSection(SECTION_IDS)
+  const scrolled = useScrolled(8)
+  const path = useRoute()
   useBodyLock(open)
+
+  useEffect(() => {
+    setOpen(false)
+  }, [path])
 
   useEffect(() => {
     const close = () => setOpen(false)
@@ -1301,80 +2309,72 @@ function Nav({ onBook, onTrack }) {
     return () => window.removeEventListener('resize', close)
   }, [])
 
-  const go = (e, href) => {
-    e.preventDefault()
-    setOpen(false)
-    document.querySelector(href)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }
-
   return (
     <>
       <a
-        className="btn btn-primary sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[120] focus:px-4 focus:py-2"
+        className="btn btn-primary sr-only focus:not-sr-only focus:fixed focus:left-4 focus:z-[120] focus:px-4 focus:py-2"
         href="#main"
+        style={{ top: 'calc(var(--header-h) + 12px)' }}
       >
         Skip to content
       </a>
 
       <nav
-        className="fixed inset-x-0 top-0 z-[80] transition-all duration-300"
-        style={{
-          background: scrolled ? 'rgba(16,20,23,.88)' : 'transparent',
-          backdropFilter: scrolled ? 'blur(14px)' : 'none',
-          borderBottom: `1px solid ${
-            scrolled ? 'color-mix(in srgb, var(--outline-variant) 22%, transparent)' : 'transparent'
-          }`,
+        className="site-nav transition-colors duration-300"
+          style={{
+          background: scrolled || open
+            ? 'color-mix(in srgb, var(--background) 90%, transparent)'
+            : 'color-mix(in srgb, var(--background) 62%, transparent)',
+          backdropFilter: 'blur(14px)',
+          borderBottom: '1px solid color-mix(in srgb, var(--outline-variant) 22%, transparent)',
         }}
       >
-        <div className="mx-auto flex max-w-container items-center justify-between px-gutter py-4">
-          <a
-            className="flex items-center gap-3"
-            href="#top"
-            onClick={(e) => {
-              e.preventDefault()
-              window.scrollTo({ top: 0, behavior: 'smooth' })
-            }}
-          >
-            <Wordmark />
-          </a>
+        <div className="mx-auto flex h-full max-w-container items-center justify-between gap-4 px-gutter">
+          <Link aria-label={site.business.name} className="flex min-w-0 items-center gap-2.5" to="/">
+            <img
+              alt=""
+              className="h-9 w-9 shrink-0 object-contain"
+              draggable={false}
+              src={publicUrl(site.business.logo)}
+            />
+            <span className="t-h3 c-on truncate leading-none tracking-tight">
+              {site.business.name}
+              <span className="c-primary">.</span>
+            </span>
+          </Link>
 
-          <div className="hidden items-center gap-7 lg:flex">
-            {NAV_LINKS.map((l) => {
-              const isActive = active === l.href.slice(1)
+          <div className="hidden items-center gap-5 xl:flex">
+            {site.pages.map((page) => {
+              const current = path === page.path
               return (
-                <a
-                  key={l.href}
-                  className="t-caps relative py-2 transition-colors"
-                  href={l.href}
-                  onClick={(e) => go(e, l.href)}
-                  style={{ color: isActive ? 'var(--primary)' : 'var(--on-surface-variant)' }}
+                <Link
+                  aria-current={current ? 'page' : undefined}
+                  className="nav-link t-caps py-2"
+                  key={page.path}
+                  style={{ color: current ? 'var(--primary)' : 'var(--on-surface-variant)' }}
+                  to={page.path}
                 >
-                  {l.label}
-                  <span
-                    className="absolute -bottom-px left-0 h-px transition-all duration-300"
-                    style={{
-                      width: isActive ? '100%' : '0%',
-                      background: 'var(--primary-container)',
-                    }}
-                  />
-                </a>
+                  {page.label}
+                </Link>
               )
             })}
           </div>
 
           <div className="flex items-center gap-2">
-            <button className="btn btn-ghost hidden px-4 py-3 sm:inline-flex" onClick={onTrack} type="button">
+            <button className="btn btn-ghost hidden px-4 py-3 lg:inline-flex" onClick={onTrack} type="button">
               <Icon name="search" size={14} />
               Track repair
             </button>
-            <button className="btn btn-primary px-5 py-3" onClick={onBook} type="button">
-              Book now
+            <button className="btn btn-primary px-3.5 py-3 sm:px-5" onClick={onBook} type="button">
+              <span className="sm:hidden">Book</span>
+              <span className="hidden sm:inline">Book now</span>
+              <Icon className="nudge" name="arrowRight" size={14} />
             </button>
             <button
               aria-expanded={open}
-              aria-label="Menu"
-              className="btn btn-ghost px-3 py-3 lg:hidden"
-              onClick={() => setOpen((o) => !o)}
+              aria-label={open ? 'Close menu' : 'Open menu'}
+              className="btn btn-ghost px-3 py-3 xl:hidden"
+              onClick={() => setOpen((value) => !value)}
               type="button"
             >
               <Icon name={open ? 'close' : 'menu'} size={18} />
@@ -1383,37 +2383,30 @@ function Nav({ onBook, onTrack }) {
         </div>
       </nav>
 
-      {/* Mobile drawer */}
+      {open && (
       <div
-        className="fixed inset-0 z-[79] lg:hidden"
-        style={{
-          pointerEvents: open ? 'auto' : 'none',
-          opacity: open ? 1 : 0,
-          transition: 'opacity .25s ease',
-        }}
+        className="menu-open fixed inset-x-0 bottom-0 z-[79] xl:hidden"
+        style={{ top: 'var(--header-h)' }}
       >
-        <div className="absolute inset-0 bg-black/60" onClick={() => setOpen(false)} />
-        <div
-          className="s-low hairline-b absolute inset-x-0 top-0 px-gutter pb-6 pt-24"
-          style={{
-            transform: open ? 'none' : 'translateY(-12px)',
-            transition: 'transform .3s cubic-bezier(.2,.7,.3,1)',
-          }}
-        >
+        <div className="absolute inset-0 bg-black/55" onClick={() => setOpen(false)} />
+        <div className="menu-panel s-low hairline-b absolute inset-x-0 top-0 max-h-full overflow-y-auto px-gutter pb-6 pt-2">
           <div className="flex flex-col">
-            {NAV_LINKS.map((l, i) => (
-              <a
-                key={l.href}
-                className="t-h3 c-on hairline-b py-4 transition-colors"
-                href={l.href}
-                onClick={(e) => go(e, l.href)}
-                style={{ transitionDelay: `${i * 20}ms` }}
+            {site.pages.map((page, i) => (
+              <Link
+                aria-current={path === page.path ? 'page' : undefined}
+                className="menu-item t-h3 hairline-b py-3.5"
+                key={page.path}
+                style={{
+                  color: path === page.path ? 'var(--primary)' : 'var(--on-surface)',
+                  transitionDelay: open ? `${i * 35}ms` : '0ms',
+                }}
+                to={page.path}
               >
-                {l.label}
-              </a>
+                {page.label}
+              </Link>
             ))}
             <button
-              className="btn btn-ghost mt-5 w-full py-4"
+              className="btn btn-ghost mt-4 w-full py-4"
               onClick={() => {
                 setOpen(false)
                 onTrack()
@@ -1426,467 +2419,109 @@ function Nav({ onBook, onTrack }) {
           </div>
         </div>
       </div>
+      )}
     </>
   )
 }
 
-function Wordmark() {
+/* ===== src/components/Footer.jsx ===== */
+function Footer({ onTrack }) {
+  const year = new Date().getFullYear()
   return (
-    <span className="flex items-center gap-2.5">
-      <span
-        className="relative flex h-8 w-8 items-center justify-center rounded-sm"
-        style={{ background: 'var(--primary-container)' }}
-      >
-        <span
-          className="t-mono text-[15px] font-bold leading-none"
-          style={{ color: '#fff' }}
-        >
-          P
-        </span>
-        <span
-          className="absolute -bottom-px left-1 right-1 h-px"
-          style={{ background: 'rgba(255,255,255,.55)' }}
-        />
-      </span>
-      <span className="t-h3 c-on leading-none tracking-tight">
-        Paint Force<span className="c-primary">.</span>
-      </span>
-    </span>
-  )
-}
-
-/* ===== src/components/Hero.jsx ===== */
-const RAIL = [
-  { k: 'SERVICE AREA', v: 'MISSISSAUGA · OAKVILLE · ETOBICOKE' },
-  { k: 'NEXT AVAILABLE', v: 'THU 08:00' },
-  { k: 'COLOUR MATCH', v: 'VIN-CODED' },
-  { k: 'WARRANTY', v: 'LIFETIME ON WORKMANSHIP' },
-]
-
-function Hero({ onBook }) {
-  return (
-    <header className="relative flex min-h-[92vh] items-center overflow-hidden pt-24" id="top">
-      <div className="absolute inset-0 z-0">
-        <SmartImage
-          alt="A technician machine-polishing a black panel under controlled lighting"
-          className="h-full w-full object-cover"
-          label={false}
-          src={HERO_IMAGE}
-          style={{ opacity: 0.42 }}
-        />
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              'linear-gradient(to top, var(--background) 6%, rgba(16,20,23,.86) 45%, rgba(16,20,23,.35) 100%)',
-          }}
-        />
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              'linear-gradient(to right, var(--background) 0%, rgba(16,20,23,.55) 48%, transparent 78%)',
-          }}
-        />
-      </div>
-
-      <div className="relative z-10 mx-auto w-full max-w-container px-gutter pb-44 pt-8 md:pb-36">
-        <div className="max-w-3xl">
-          <div className="fade" style={{ animationDelay: '80ms' }}>
-            <span className="s-high hairline inline-flex items-center gap-2 rounded-full px-3.5 py-2">
-              <span className="c-primary flex">
-                <Stars size={12} />
+    <footer className="s-lowest hairline-t py-16 pb-28 sm:pb-16">
+      <div className="mx-auto max-w-container px-gutter">
+        <div className="grid gap-10 md:grid-cols-12">
+          <div className="md:col-span-4">
+            <span className="flex items-center gap-2.5">
+              <img alt="" className="h-9 w-9 object-contain" draggable={false} src={publicUrl(site.business.logo)} />
+              <span className="t-h2 c-on">
+                {site.business.name}
+                <span className="c-primary">.</span>
               </span>
-              <span className="t-caps c-variant text-[11px]">4.9 ON GOOGLE · 990+ REVIEWS</span>
             </span>
-          </div>
-
-          <h1 className="t-display c-on mt-6">
-            <span className="fade block" style={{ animationDelay: '160ms' }}>
-              Showroom finish,
-            </span>
-            <span className="fade block c-primary" style={{ animationDelay: '260ms' }}>
-              in your driveway.
-            </span>
-          </h1>
-
-          <p
-            className="t-body-lg c-variant fade mt-6 max-w-xl"
-            style={{ animationDelay: '360ms' }}
-          >
-            Paint and scratch repair that comes to you. A fully equipped mobile unit handles the work
-            at your home or office — no body-shop queue, no week without your car.
-          </p>
-
-          <div className="fade mt-9 flex flex-wrap items-center gap-3" style={{ animationDelay: '440ms' }}>
-            <button className="btn btn-primary px-7 py-4" onClick={onBook} type="button">
-              Book a repair
-              <Icon name="arrowRight" size={15} />
+            <p className="t-body c-variant mt-4 max-w-sm">
+              Mobile paint and scratch repair based in {site.business.city}. Same visit model as a
+              body shop, finished in the driveway.
+            </p>
+            <button className="btn btn-ghost mt-6 px-5 py-3" onClick={onTrack} type="button">
+              <Icon name="search" size={14} />
+              Track a repair
             </button>
-            <a
-              className="btn btn-ghost px-7 py-4"
-              href="#work"
-              onClick={(e) => {
-                e.preventDefault()
-                document.querySelector('#work')?.scrollIntoView({ behavior: 'smooth' })
-              }}
-            >
-              See the work
-            </a>
-            <a className="btn btn-quiet px-3 py-4" href={PHONE_HREF}>
-              <Icon name="phone" size={15} />
-              {PHONE}
-            </a>
+          </div>
+
+          <div className="md:col-span-2">
+            <span className="t-caps c-variant opacity-55">Pages</span>
+            <ul className="mt-4 flex flex-col gap-2.5">
+              {site.pages.map((page) => (
+                <li key={page.path}>
+                  <Link className="c-on text-[15px] transition-opacity hover:opacity-70" to={page.path}>
+                    {page.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="md:col-span-3">
+            <span className="t-caps c-variant opacity-55">Contact</span>
+            <ul className="mt-4 flex flex-col gap-3">
+              <li>
+                <a className="c-on flex items-center gap-2 text-[15px] transition-opacity hover:opacity-75" href={site.business.phoneHref}>
+                  <span className="c-primary">
+                    <Icon name="phone" size={15} />
+                  </span>
+                  {site.business.phone}
+                </a>
+              </li>
+              <li className="c-variant flex items-start gap-2 text-[15px]">
+                <span className="c-primary mt-0.5">
+                  <Icon name="pin" size={15} />
+                </span>
+                {site.business.address}
+              </li>
+            </ul>
+            <div className="mt-5">
+              <GoogleReviewButton />
+            </div>
+          </div>
+
+          <div className="md:col-span-3">
+            <div className="flex items-center justify-between gap-3 md:justify-end">
+              <span className="t-caps c-variant opacity-55">Hours</span>
+              {site.hours.placeholder && <Placeholder>Placeholder</Placeholder>}
+            </div>
+            <dl className="mt-4 flex flex-col gap-2">
+              {site.hours.rows.map(([day, hours]) => (
+                <div className="flex justify-between gap-4" key={day}>
+                  <dt className="t-caps c-variant text-[10px] opacity-60">{day}</dt>
+                  <dd className="t-mono c-on text-[12px]">{hours}</dd>
+                </div>
+              ))}
+            </dl>
+            <p className="t-body c-variant mt-3 text-[13px] opacity-70">{site.hours.note}</p>
           </div>
         </div>
-      </div>
 
-      {/* Signature: a technical readout strip, set in the mono utility face */}
-      <div
-        className="fade absolute inset-x-0 bottom-0 z-10 hairline-t"
-        style={{ animationDelay: '600ms', background: 'rgba(11,15,18,.55)', backdropFilter: 'blur(8px)' }}
-      >
-        <dl className="mx-auto grid max-w-container grid-cols-2 px-gutter md:grid-cols-4">
-          {RAIL.map((item, i) => (
-            <div
-              key={item.k}
-              className="py-4 md:py-5"
-              style={{
-                borderLeft: i === 0 ? 'none' : '1px solid color-mix(in srgb, var(--outline-variant) 22%, transparent)',
-                paddingLeft: i === 0 ? 0 : '20px',
-              }}
-            >
-              <dt className="t-caps text-[10px]" style={{ color: 'color-mix(in srgb, var(--on-surface-variant) 55%, transparent)' }}>
-                {item.k}
-              </dt>
-              <dd className="t-mono c-on mt-2 text-[11px] leading-tight tracking-wide md:text-[12px]">
-                {item.v}
-              </dd>
-            </div>
-          ))}
-        </dl>
-      </div>
-
-      <style>{`
-        .fade { opacity: 0; animation: hero-fade .7s cubic-bezier(.2,.7,.3,1) both; }
-        @keyframes hero-fade { from { opacity:0; transform: translateY(18px) } to { opacity:1; transform:none } }
-        @media (prefers-reduced-motion: reduce) { .fade { animation: none; opacity: 1 } }
-      `}</style>
-    </header>
-  )
-}
-
-/* ===== src/components/Services.jsx ===== */
-function Services({ onBook }) {
-  const ref = useReveal()
-  const [open, setOpen] = useState(null)
-
-  return (
-    <section className="s-low py-section" id="services">
-      <div className="mx-auto max-w-container px-gutter">
-        <SectionHead
-          eyebrow="Services"
-          lead="Three repairs cover most of what a daily-driven car picks up. Each one is priced up front and finished in a single visit."
-          title="What we fix."
-        />
-
-        <div ref={ref} className="reveal mt-14 grid gap-4 md:grid-cols-3">
-          {SERVICES.map((s, i) => {
-            const isOpen = open === s.id
-            return (
-              <article
-                key={s.id}
-                className="reveal card card-interactive group relative flex flex-col overflow-hidden p-6"
-                style={revealDelay(i)}
-              >
-                <span
-                  className="absolute inset-x-0 top-0 h-px opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-                  style={{ background: 'linear-gradient(to right, var(--primary-container), transparent)' }}
-                />
-
-                <div className="flex items-start justify-between">
-                  <span
-                    className="s-container hairline flex h-11 w-11 items-center justify-center rounded"
-                    style={{ color: 'var(--primary)' }}
-                  >
-                    <Icon name={s.icon} size={20} />
-                  </span>
-                  <span className="chip">{s.est}</span>
-                </div>
-
-                <h3 className="t-h2 c-on mt-6">{s.name}</h3>
-                <p className="t-body c-variant mt-3 flex-1">{s.blurb}</p>
-
-                <div
-                  className="grid transition-all duration-300"
-                  style={{
-                    gridTemplateRows: isOpen ? '1fr' : '0fr',
-                    opacity: isOpen ? 1 : 0,
-                    marginTop: isOpen ? 20 : 0,
-                  }}
-                >
-                  <ul className="overflow-hidden">
-                    {s.detail.map((d) => (
-                      <li key={d} className="t-body c-variant flex gap-3 py-1.5 text-[15px]">
-                        <span className="c-primary mt-[5px] shrink-0">
-                          <Icon name="check" size={13} strokeWidth={2.4} />
-                        </span>
-                        {d}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div className="hairline-t mt-6 flex items-center justify-between pt-5">
-                  <span className="t-mono c-on text-[13px]">{s.price}</span>
-                  <div className="flex items-center gap-1">
-                    <button
-                      aria-expanded={isOpen}
-                      className="btn btn-quiet px-2 py-2"
-                      onClick={() => setOpen(isOpen ? null : s.id)}
-                      type="button"
-                    >
-                      {isOpen ? 'Less' : 'Details'}
-                      <span
-                        className="transition-transform duration-300"
-                        style={{ transform: isOpen ? 'rotate(-90deg)' : 'rotate(90deg)' }}
-                      >
-                        <Icon name="chevronRight" size={13} />
-                      </span>
-                    </button>
-                    <button
-                      className="btn btn-ghost px-3 py-2"
-                      onClick={() => onBook(s.id)}
-                      type="button"
-                    >
-                      Book
-                    </button>
-                  </div>
-                </div>
-              </article>
-            )
-          })}
+        <div className="hairline-t mt-12 flex flex-col gap-3 pt-7 sm:flex-row sm:items-center sm:justify-between">
+          <p className="t-caps c-variant text-[10px] opacity-55">
+            © {year} {site.business.name}
+            {site.business.warranty ? ` · ${site.business.warranty}` : ''}
+          </p>
+          {site.demo.show && (
+            <p className="t-caps c-variant text-[10px] opacity-55">
+              {site.studio.name} {site.studio.package} demo
+            </p>
+          )}
         </div>
       </div>
-    </section>
-  )
-}
-
-/* ===== src/components/Process.jsx ===== */
-function Process({ onBook }) {
-  const ref = useReveal()
-
-  return (
-    <section className="hairline-t hairline-b py-section" id="process">
-      <div className="mx-auto max-w-container px-gutter">
-        <SectionHead
-          center
-          eyebrow="How it works"
-          lead="Three steps, one visit. Order matters here — nothing starts until the price is agreed."
-          title="From photo to finished."
-        />
-
-        <ol ref={ref} className="reveal relative mt-16 grid gap-10 md:grid-cols-3 md:gap-8">
-          {/* Connector: a thin silver rule the markers sit on */}
-          <span
-            aria-hidden="true"
-            className="absolute hidden md:block"
-            style={{
-              top: 22,
-              left: '16.6%',
-              right: '16.6%',
-              height: 1,
-              background:
-                'linear-gradient(to right, transparent, color-mix(in srgb, var(--secondary) 30%, transparent) 12%, color-mix(in srgb, var(--secondary) 30%, transparent) 88%, transparent)',
-            }}
-          />
-
-          {PROCESS.map((step, i) => (
-            <li
-              key={step.n}
-              className="reveal relative flex flex-col md:items-center md:text-center"
-              style={revealDelay(i, 110)}
-            >
-              <span
-                className="s-container flex h-11 w-11 shrink-0 items-center justify-center rounded-full"
-                style={{
-                  border: '1px solid color-mix(in srgb, var(--secondary) 40%, transparent)',
-                  color: 'var(--primary)',
-                }}
-              >
-                <span className="t-mono text-[13px] font-bold tracking-wider">{step.n}</span>
-              </span>
-
-              <span className="t-caps mt-5 text-[10px]" style={{ color: 'color-mix(in srgb, var(--on-surface-variant) 60%, transparent)' }}>
-                {step.meta}
-              </span>
-              <h3 className="t-h2 c-on mt-2">{step.title}</h3>
-              <p className="t-body c-variant mt-3 max-w-xs md:mx-auto">{step.body}</p>
-            </li>
-          ))}
-        </ol>
-
-        <div className="mt-14 flex justify-center">
-          <button className="btn btn-primary px-7 py-4" onClick={() => onBook()} type="button">
-            Start with step one
-          </button>
-        </div>
-      </div>
-    </section>
-  )
-}
-
-/* ===== src/components/Portfolio.jsx ===== */
-function Portfolio() {
-  const ref = useReveal()
-
-  return (
-    <section className="s-lowest py-section" id="work">
-      <div className="mx-auto max-w-container px-gutter">
-        <SectionHead
-          eyebrow="Recent work"
-          lead="Drag any handle to see the panel before and after. Every one of these was finished on a driveway, not in a shop."
-          title="Real cars. Real panels."
-        />
-
-        <div ref={ref} className="reveal mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {PORTFOLIO.map((item, i) => (
-            <article
-              key={item.id}
-              className="reveal card card-interactive flex flex-col overflow-hidden"
-              style={revealDelay(i, 90)}
-            >
-              <BeforeAfter
-                alt={item.vehicle}
-                className="aspect-[4/3] w-full"
-                composite={item.composite}
-                src={item.src}
-              />
-
-              <div className="flex flex-1 flex-col p-5">
-                <div className="flex items-center justify-between gap-3">
-                  <span className="t-caps c-primary text-[10px]">{item.tag}</span>
-                  <span className="t-mono c-variant flex items-center gap-1.5 text-[11px] opacity-70">
-                    <Icon name="clock" size={12} />
-                    {item.duration}
-                  </span>
-                </div>
-
-                <p className="t-h3 c-on mt-2 text-[16px]">{item.vehicle}</p>
-
-                <p className="t-body c-variant mt-4 flex-1 text-[15px] italic">“{item.quote}”</p>
-
-                <div className="hairline-t mt-5 flex items-center gap-3 pt-4">
-                  <span
-                    className="s-highest flex h-8 w-8 items-center justify-center rounded-full text-[11px] font-semibold"
-                    style={{ color: 'var(--on-surface-variant)' }}
-                  >
-                    {item.initials}
-                  </span>
-                  <span className="flex-1">
-                    <span className="c-on block text-[14px] font-medium">{item.author}</span>
-                    <span className="t-caps c-variant block text-[9px] opacity-60">Verified customer</span>
-                  </span>
-                  <span className="c-primary">
-                    <Stars size={12} />
-                  </span>
-                </div>
-              </div>
-            </article>
-          ))}
-        </div>
-
-        <p className="t-caps c-variant mt-8 flex items-center gap-2 opacity-55">
-          <Icon name="sliders" size={13} />
-          Drag, or focus a handle and use the arrow keys
-        </p>
-      </div>
-    </section>
-  )
-}
-
-/* ===== src/components/Reviews.jsx ===== */
-function Reviews() {
-  const ref = useReveal()
-
-  return (
-    <section className="s-low py-section" id="reviews">
-      <div className="mx-auto max-w-container px-gutter">
-        <SectionHead eyebrow="Reviews" title="What owners say." />
-
-        <div ref={ref} className="reveal mt-12 grid gap-5 md:grid-cols-2">
-          {REVIEWS.map((r, i) => (
-            <figure
-              key={r.author}
-              className="reveal card flex flex-col p-7 md:p-8"
-              style={{
-                ...revealDelay(i, 110),
-                borderLeft: '2px solid color-mix(in srgb, var(--primary-container) 70%, transparent)',
-              }}
-            >
-              <span className="c-primary">
-                <Stars size={15} />
-              </span>
-              <blockquote className="t-body-lg c-on mt-5 flex-1">“{r.quote}”</blockquote>
-              <figcaption className="hairline-t mt-6 flex items-end justify-between gap-4 pt-5">
-                <span>
-                  <span className="t-h3 c-on block text-[16px]">{r.author}</span>
-                  <span className="t-caps c-variant mt-1.5 block text-[10px] opacity-65">
-                    {r.location}
-                  </span>
-                </span>
-                <span className="t-mono c-variant text-right text-[10px] tracking-widest opacity-50">
-                  {r.vehicle}
-                </span>
-              </figcaption>
-            </figure>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
-/* ===== src/components/CTA.jsx ===== */
-function CTA({ onBook }) {
-  const ref = useReveal()
-
-  return (
-    <section className="s-container relative overflow-hidden py-section">
-      <div
-        aria-hidden="true"
-        className="absolute inset-0"
-        style={{
-          background:
-            'radial-gradient(120% 80% at 50% 0%, color-mix(in srgb, var(--primary-container) 12%, transparent), transparent 60%)',
-        }}
-      />
-      <div ref={ref} className="reveal relative mx-auto flex max-w-3xl flex-col items-center px-gutter text-center">
-        <span className="t-caps c-primary">Next slot Thursday 08:00</span>
-        <h2 className="t-h1 c-on mt-5">Book the visit.</h2>
-        <p className="t-body-lg c-variant mt-4 max-w-xl">
-          Pick a two-hour window and a technician comes to you. Most jobs are quoted the same day.
-        </p>
-        <div className="mt-9 flex flex-col items-center gap-5 sm:flex-row">
-          <button className="btn btn-primary px-9 py-4" onClick={() => onBook()} type="button">
-            Choose a time
-            <Icon name="arrowRight" size={15} />
-          </button>
-          <span className="t-caps c-variant opacity-50">or</span>
-          <a className="t-h2 c-primary flex items-center gap-2.5 transition-colors hover:opacity-80" href={PHONE_HREF}>
-            <Icon name="phone" size={19} />
-            {PHONE}
-          </a>
-        </div>
-      </div>
-    </section>
+    </footer>
   )
 }
 
 /* ===== src/components/QuoteForm.jsx ===== */
 const EMPTY = { name: '', email: '', phone: '', vehicle: '', service: '', description: '' }
 
-function QuoteForm() {
+function QuoteForm({ heading = true }) {
   const ref = useReveal()
   const toast = useToast()
   const [values, setValues] = useState(EMPTY)
@@ -1946,15 +2581,19 @@ function QuoteForm() {
   }
 
   return (
-    <section className="s-lowest py-section" id="quote">
-      <div className="mx-auto max-w-container px-gutter">
-        <SectionHead
-          eyebrow="Estimate"
-          lead="Send photos of the damage and a technician replies with a fixed price, usually within two hours."
-          title="Get a price."
-        />
+    <section className={heading ? 's-lowest py-section' : 'card p-5 sm:p-7'} id="quote">
+      <div className={heading ? 'mx-auto max-w-container px-gutter' : ''}>
+        {heading ? (
+          <SectionHead
+            eyebrow="Estimate"
+            lead="Send photos of the damage and a technician replies with a fixed price, usually within two hours."
+            title="Get a price."
+          />
+        ) : (
+          <h2 className="t-h2 c-on">Quote request</h2>
+        )}
 
-        <div ref={ref} className="reveal mt-12">
+        <div ref={ref} className={heading ? 'reveal mt-12' : 'reveal mt-6'}>
           {done ? (
             <div className="card flex flex-col items-center px-6 py-16 text-center">
               <span
@@ -2030,7 +2669,7 @@ function QuoteForm() {
                     value={values.service}
                   >
                     <option value="">Choose the closest match</option>
-                    {SERVICES.map((s) => (
+                    {site.services.map((s) => (
                       <option key={s.id} value={s.id}>
                         {s.name}
                       </option>
@@ -2262,7 +2901,7 @@ function BookingModal({ open, onClose, presetService }) {
     }
   }
 
-  const service = SERVICES.find((s) => s.id === values.service)
+  const service = site.services.find((s) => s.id === values.service)
   const chosenDay = days.find((d) => d.iso === values.date)
 
   return (
@@ -2403,7 +3042,7 @@ function StepService({ value, onPick }) {
       <legend className="t-h2 c-on">What needs work?</legend>
       <p className="t-body c-variant mt-2">Not sure? Pick the closest and add a note on the next screen.</p>
       <div className="mt-6 grid gap-3 sm:grid-cols-3">
-        {SERVICES.map((s) => {
+        {site.services.map((s) => {
           const selected = value === s.id
           return (
             <button
@@ -2424,7 +3063,7 @@ function StepService({ value, onPick }) {
                 <Icon name={s.icon} size={22} />
               </span>
               <span className="t-h3 c-on mt-4 text-[16px]">{s.name}</span>
-              <span className="t-mono c-variant mt-2 text-[12px]">{s.price}</span>
+              {/* <span className="t-mono c-variant mt-2 text-[12px]">{s.price}</span> */}
               <span className="chip mt-4">{s.est}</span>
             </button>
           )
@@ -2695,7 +3334,8 @@ function TrackModal({ open, onClose }) {
       <div className="px-6 py-9 sm:px-9">
         <h2 className="t-h1 c-on">Track a repair.</h2>
         <p className="t-body c-variant mt-3">
-          Enter the reference from your confirmation email.
+          Enter the reference from your confirmation. This demo includes sample jobs{' '}
+          {site.sampleJobs.join(', ')}. They are not live customer records.
         </p>
 
         <form className="mt-6 flex flex-col gap-3 sm:flex-row" onSubmit={lookup}>
@@ -2837,126 +3477,652 @@ function Timeline({ job, onReset }) {
   )
 }
 
-/* ===== src/components/Footer.jsx ===== */
-function Footer({ onTrack }) {
+/* ===== src/pages/Home.jsx ===== */
+const RAIL = [
+  { k: 'Based in', v: `${site.business.city}, ${site.business.region}` },
+  { k: 'Phone', v: site.business.phone },
+  { k: 'Colour match', v: 'VIN-coded' },
+  { k: 'Prices', v: 'Placeholder', placeholder: true },
+]
+
+function Home({ onBook }) {
+  usePageMeta(site.seo.home.title, site.seo.home.description)
+  const servicesRef = useReveal()
+  const workRef = useReveal()
+  const featured = site.portfolio[0]
+
   return (
-    <footer className="s-lowest hairline-t py-16">
-      <div className="mx-auto max-w-container px-gutter">
-        <div className="grid gap-10 md:grid-cols-12">
-          <div className="md:col-span-5">
-            <span className="t-h2 c-on">
-              Paint Force<span className="c-primary">.</span>
-            </span>
-            <p className="t-body c-variant mt-4 max-w-sm">
-              Mobile paint and scratch repair across the western GTA. Same finish as a body shop,
-              without leaving your driveway.
+    <>
+      <header className="relative md:flex md:min-h-[calc(100svh-var(--header-h))] md:flex-col md:justify-end md:overflow-hidden">
+        <div className="relative h-[42vh] min-h-[220px] overflow-hidden md:absolute md:inset-0 md:h-auto md:min-h-0">
+          <HeroScrub />
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background:
+                'linear-gradient(to top, var(--background) 4%, rgba(16,20,23,.45) 42%, rgba(16,20,23,.12) 100%)',
+            }}
+          />
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background:
+                'linear-gradient(to right, var(--background) 0%, rgba(16,20,23,.28) 36%, transparent 68%)',
+            }}
+          />
+          <p className="chip badge-illustrative chip-wrap pointer-events-none absolute right-3 top-3 z-20 max-w-[15rem] sm:right-6 sm:top-5 sm:max-w-[20rem]">
+            Illustrative video, not footage of Paint Force&apos;s work
+          </p>
+        </div>
+
+        <div className="relative z-10 mx-auto w-full max-w-container px-gutter py-8 md:shrink-0 md:pb-40 md:pt-16">
+          <div className="max-w-3xl">
+            <p className="rise s-high hairline inline-flex items-center gap-2 rounded-full px-3.5 py-2" style={{ animationDelay: '40ms' }}>
+              <span className="h-1.5 w-1.5 rounded-full" style={{ background: 'var(--primary-container)' }} />
+              <span className="t-caps c-variant text-[11px]">
+                Mobile repair · {site.business.city}
+              </span>
             </p>
-            <button className="btn btn-ghost mt-6 px-5 py-3" onClick={onTrack} type="button">
-              <Icon name="search" size={14} />
-              Track a repair
+            <h1 className="t-display c-on mt-6">
+              <span className="rise block" style={{ animationDelay: '120ms' }}>
+                Showroom finish,
+              </span>
+              <span className="rise c-primary block" style={{ animationDelay: '200ms' }}>
+                in your driveway.
+              </span>
+            </h1>
+            <p className="t-body-lg c-variant rise mt-6 max-w-xl" style={{ animationDelay: '300ms' }}>
+              Paint and scratch repair that comes to you in {site.business.city}. A mobile unit handles
+              scratch removal, paint touch-up, and bumper repair at your home or office.
+            </p>
+            <div className="rise mt-9 flex flex-wrap items-center gap-3" style={{ animationDelay: '380ms' }}>
+              <button className="btn btn-primary px-7 py-4" onClick={() => onBook()} type="button">
+                Book a repair
+                <Icon className="nudge" name="arrowRight" size={15} />
+              </button>
+              <Link className="btn btn-ghost px-7 py-4" to="/gallery">
+                See the work
+              </Link>
+              <a className="btn btn-quiet px-3 py-4" href={site.business.phoneHref}>
+                <Icon name="phone" size={15} />
+                {site.business.phone}
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div
+          className="rise relative z-10 w-full hairline-t md:absolute md:inset-x-0 md:bottom-0 md:shrink-0"
+          style={{ animationDelay: '480ms', background: 'rgba(11,15,18,.72)', backdropFilter: 'blur(8px)' }}
+        >
+          <dl className="mx-auto grid max-w-container grid-cols-2 gap-px md:grid-cols-4" style={{ background: 'color-mix(in srgb, var(--outline-variant) 28%, transparent)' }}>
+            {RAIL.map((item) => (
+              <div className="px-gutter py-4 md:py-5" key={item.k} style={{ background: 'rgba(11,15,18,.92)' }}>
+                <dt className="t-caps text-[10px]" style={{ color: 'color-mix(in srgb, var(--on-surface-variant) 70%, transparent)' }}>
+                  {item.k}
+                </dt>
+                <dd className="t-mono c-on mt-2 flex flex-wrap items-center gap-2 text-[12px] leading-tight tracking-wide">
+                  {item.v}
+                  {item.placeholder && <Placeholder>Placeholder</Placeholder>}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </header>
+
+      <PaintRoom />
+
+      <section className="s-low py-section">
+        <div className="mx-auto grid max-w-container gap-10 px-gutter sm:grid-cols-3">
+          {site.counters.map((item) => (
+            <Counter key={item.label} label={item.label} note={item.note} value={item.value} />
+          ))}
+        </div>
+      </section>
+
+      <section className="py-section">
+        <div className="mx-auto max-w-container px-gutter">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div className="max-w-xl">
+              <p className="t-caps c-primary">Services</p>
+              <h2 className="t-h1 c-on mt-3">What we fix in {site.business.city}.</h2>
+            </div>
+            <Link className="btn btn-ghost px-5 py-3" to="/services">
+              Full price list
+              <Icon className="nudge" name="arrowRight" size={14} />
+            </Link>
+          </div>
+          <div className="reveal mt-10 grid gap-4 md:grid-cols-3" ref={servicesRef}>
+            {site.services.map((service, i) => (
+              <article className="reveal h-full" key={service.id} style={revealDelay(i)}>
+                <Tilt className="h-full">
+                  <div className="card card-interactive flex h-full flex-col p-6">
+                    <div className="flex items-start justify-between gap-3">
+                      <span className="s-container hairline flex h-11 w-11 items-center justify-center rounded" style={{ color: 'var(--primary)' }}>
+                        <Icon name={service.icon} size={20} />
+                      </span>
+                      <span className="chip">{service.est}</span>
+                    </div>
+                    <h3 className="t-h2 c-on mt-6">{service.name}</h3>
+                    <p className="t-body c-variant mt-3 flex-1">{service.blurb}</p>
+                    <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
+                      <span className="t-mono c-on text-[13px]">{service.price}</span>
+                      {service.pricePlaceholder && <Placeholder>Placeholder price</Placeholder>}
+                    </div>
+                  </div>
+                </Tilt>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="s-lowest py-section">
+        <div className="mx-auto grid max-w-container items-center gap-10 px-gutter lg:grid-cols-2">
+          <div className="reveal" ref={workRef}>
+            <p className="t-caps c-primary">Gallery</p>
+            <h2 className="t-h1 c-on mt-3">Drag across a repair.</h2>
+            <p className="t-body-lg c-variant mt-4">
+              Before-and-after panels show the kind of scratch, paint, and bumper work Paint Force
+              describes. These photos are illustrative stand-ins, not confirmed jobs from the shop.
+            </p>
+            <Link className="btn btn-primary mt-8 px-6 py-4" to="/gallery">
+              Open the gallery
+              <Icon className="nudge" name="arrowRight" size={15} />
+            </Link>
+          </div>
+          {featured && (
+            <BeforeAfter alt={featured.vehicle} className="aspect-[4/3] w-full rounded" src={featured.src} />
+          )}
+        </div>
+      </section>
+
+      <section className="s-container relative overflow-hidden py-section">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              'radial-gradient(90% 80% at 80% 0%, color-mix(in srgb, var(--primary-container) 16%, transparent), transparent 60%)',
+          }}
+        />
+        <div className="relative mx-auto flex max-w-container flex-col items-start justify-between gap-8 px-gutter md:flex-row md:items-center">
+          <div className="max-w-xl">
+            <h2 className="t-h1 c-on">Ask for a price.</h2>
+            <p className="t-body-lg c-variant mt-4">{site.business.summary}</p>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <Link className="btn btn-primary px-7 py-4" to="/contact">
+              Request a quote
+              <Icon className="nudge" name="arrowRight" size={15} />
+            </Link>
+            <button className="btn btn-ghost px-7 py-4" onClick={() => onBook()} type="button">
+              Book a window
             </button>
           </div>
+        </div>
+      </section>
+    </>
+  )
+}
 
-          <div className="md:col-span-3">
-            <span className="t-caps c-variant opacity-55">Contact</span>
-            <ul className="mt-4 flex flex-col gap-3">
-              <li>
-                <a className="c-on flex items-center gap-2 text-[15px] transition-colors hover:opacity-75" href={PHONE_HREF}>
-                  <span className="c-primary">
-                    <Icon name="phone" size={15} />
-                  </span>
-                  {PHONE}
-                </a>
-              </li>
-              <li className="c-variant flex items-start gap-2 text-[15px]">
-                <span className="c-primary mt-0.5">
-                  <Icon name="pin" size={15} />
-                </span>
-                {ADDRESS}
-              </li>
-            </ul>
+/* ===== src/pages/ServicesPage.jsx ===== */
+function ServicesPage({ onBook }) {
+  usePageMeta(site.seo.services.title, site.seo.services.description)
+  const ref = useReveal()
+
+  return (
+    <>
+      <PageHero
+        eyebrow={`Price list · ${site.business.city}`}
+        lead="Three repairs cover most of what a daily-driven car picks up. Each one is described as a single visit. The dollar amounts are placeholders from the previous draft."
+        title="Services and starting prices."
+      />
+      <section className="py-section">
+        <div className="mx-auto max-w-container px-gutter">
+          <div className="reveal grid gap-4 lg:grid-cols-3" ref={ref}>
+            {site.services.map((service, i) => {
+              return (
+                <article className="reveal h-full" key={service.id} style={revealDelay(i)}>
+                  <Tilt className="h-full">
+                    <div className="card card-interactive flex h-full flex-col p-6">
+                      <div className="flex items-start justify-between gap-3">
+                        <span className="s-container hairline flex h-11 w-11 items-center justify-center rounded" style={{ color: 'var(--primary)' }}>
+                          <Icon name={service.icon} size={20} />
+                        </span>
+                        <span className="chip">{service.est}</span>
+                      </div>
+                      <h2 className="t-h2 c-on mt-6">{service.name}</h2>
+                      <p className="t-body c-variant mt-3">{service.blurb}</p>
+                      <ul className="mt-5 flex flex-col gap-2">
+                        {service.detail.map((line) => (
+                          <li className="t-body c-variant flex gap-3 text-[15px]" key={line}>
+                            <span className="c-primary mt-1 shrink-0">
+                              <Icon name="check" size={13} strokeWidth={2.4} />
+                            </span>
+                            {line}
+                          </li>
+                        ))}
+                      </ul>
+                      <div className="mt-6 flex flex-wrap items-center gap-2">
+                        <span className="t-mono c-on text-[14px]">{service.price}</span>
+                        {service.pricePlaceholder && <Placeholder>Placeholder price</Placeholder>}
+                      </div>
+                      <div className="mt-auto pt-6">
+                        <button className="btn btn-ghost px-3 py-2" onClick={() => onBook(service.id)} type="button">
+                          Book
+                          <Icon className="nudge" name="arrowRight" size={13} />
+                        </button>
+                      </div>
+                    </div>
+                  </Tilt>
+                </article>
+              )
+            })}
           </div>
+        </div>
+      </section>
+    </>
+  )
+}
 
-          <div className="md:col-span-4 md:text-right">
-            <span className="t-caps c-variant opacity-55">Hours</span>
-            <dl className="mt-4 flex flex-col gap-2">
-              {[
-                ['MON – FRI', '07:00 – 18:00'],
-                ['SATURDAY', '08:00 – 16:00'],
-                ['SUNDAY', 'CLOSED'],
-              ].map(([d, h]) => (
-                <div key={d} className="flex justify-between gap-6 md:justify-end">
-                  <dt className="t-caps c-variant text-[10px] opacity-60">{d}</dt>
-                  <dd className="t-mono c-on w-[110px] text-[12px] md:text-right">{h}</dd>
+/* ===== src/pages/GalleryPage.jsx ===== */
+function GalleryPage() {
+  usePageMeta(site.seo.gallery.title, site.seo.gallery.description)
+  const ref = useReveal()
+
+  return (
+    <>
+      <PageHero
+        eyebrow={`Gallery · ${site.business.city}`}
+        lead="Drag the handle, click the frame, or focus it and use the arrow keys. Captions and photos are from the previous draft and are marked illustrative until real job photography replaces them."
+        title="Before and after paint work."
+      />
+      <section className="py-section">
+        <div className="reveal mx-auto grid max-w-container gap-6 px-gutter md:grid-cols-2 lg:grid-cols-3" ref={ref}>
+          {site.portfolio.map((item, i) => (
+            <article className="reveal h-full" key={item.id} style={revealDelay(i, 80)}>
+              <Tilt className="h-full">
+                <div className="card card-interactive flex h-full flex-col overflow-hidden">
+                  <BeforeAfter alt={`${item.vehicle}, illustrative before and after`} className="aspect-[4/3] w-full" src={item.src} />
+                  <div className="flex flex-1 flex-col p-5">
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="t-caps c-primary text-[10px]">{item.tag}</span>
+                      <span className="t-mono c-variant flex items-center gap-1.5 text-[11px] opacity-70">
+                        <Icon name="clock" size={12} />
+                        {item.duration}
+                      </span>
+                    </div>
+                    <h2 className="t-h3 c-on mt-2">{item.vehicle}</h2>
+                    <p className="t-body c-variant mt-4 flex-1 text-[15px] italic">“{item.quote}”</p>
+                    <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
+                      <span className="c-on text-[14px]">{item.author}</span>
+                      <Placeholder>Sample caption</Placeholder>
+                    </div>
+                  </div>
                 </div>
-              ))}
-            </dl>
-          </div>
+              </Tilt>
+            </article>
+          ))}
         </div>
+      </section>
+    </>
+  )
+}
 
-        <div className="hairline-t mt-12 flex flex-col gap-4 pt-7 sm:flex-row sm:items-center sm:justify-between">
-          <p className="t-caps c-variant text-[9px] opacity-45">
-            © {new Date().getFullYear()} Paint Force, Inc. · Lifetime workmanship warranty
-          </p>
-          <div className="flex gap-6">
-            <a className="t-caps c-variant text-[9px] opacity-45 transition-opacity hover:opacity-90" href="#">
-              Terms
-            </a>
-            <a className="t-caps c-variant text-[9px] opacity-45 transition-opacity hover:opacity-90" href="#">
-              Privacy
-            </a>
+/* ===== src/pages/AboutPage.jsx ===== */
+function AboutPage() {
+  usePageMeta(site.seo.about.title, site.seo.about.description)
+  const ref = useReveal()
+
+  return (
+    <>
+      <PageHero
+        eyebrow={`About · ${site.business.city}`}
+        lead={site.business.summary}
+        title="A mobile unit, one driveway, one visit."
+      />
+
+      <section className="py-section">
+        <div className="mx-auto grid max-w-container gap-4 px-gutter md:grid-cols-3" ref={ref}>
+          {site.process.map((step, i) => (
+            <article className="reveal h-full" key={step.n} style={revealDelay(i)}>
+              <Tilt className="h-full">
+                <div className="card card-interactive h-full p-6">
+                  <span className="t-mono c-primary text-[13px]">{step.n}</span>
+                  <h2 className="t-h2 c-on mt-4">{step.title}</h2>
+                  <p className="t-body c-variant mt-3">{step.body}</p>
+                  <p className="t-caps c-variant mt-5 text-[10px] opacity-60">{step.meta}</p>
+                </div>
+              </Tilt>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="s-low py-section">
+        <div className="mx-auto grid max-w-container gap-10 px-gutter lg:grid-cols-2">
+          <div>
+            <h2 className="t-h1 c-on">Where the work starts.</h2>
+            <p className="t-body-lg c-variant mt-4">
+              The address on file is {site.business.address}. Call {site.business.phone}. Owner
+              story, year founded, and team photos were not in the source material.
+            </p>
+            <p className="mt-4">
+              <Placeholder>Add the studio story</Placeholder>
+            </p>
+            <dl className="mt-8 flex flex-col gap-4">
+              <div>
+                <dt className="t-caps c-variant text-[10px] opacity-60">Confirmed base</dt>
+                <dd className="c-on mt-1">{site.serviceArea.confirmed}</dd>
+              </div>
+              <div>
+                <dt className="t-caps c-variant text-[10px] opacity-60">Service area</dt>
+                <dd className="c-variant mt-1">{site.serviceArea.note}</dd>
+                <dd className="mt-2">
+                  <Placeholder>Placeholder area</Placeholder>
+                </dd>
+              </div>
+            </dl>
+            <Link className="btn btn-ghost mt-8 px-5 py-3" to="/contact">
+              Map, hours, and quote
+              <Icon className="nudge" name="arrowRight" size={14} />
+            </Link>
+          </div>
+
+          <div className="card flex flex-col items-start gap-5 p-6 sm:p-8">
+            <div>
+              <h2 className="t-h2 c-on">Logo and photos</h2>
+              <p className="t-body c-variant mt-3">
+                Swap <span className="t-mono text-[13px]">public/logo.png</span> for the client logo.
+                Gallery frames are sized for professional before-and-after photos. The images in this
+                demo are illustrative.
+              </p>
+            </div>
+            <img
+              alt={site.business.logoAlt}
+              className="s-lowest hairline max-h-40 w-full object-contain p-4"
+              src={publicUrl(site.business.logo)}
+            />
+            <Placeholder>Room for professional photos</Placeholder>
           </div>
         </div>
-      </div>
-    </footer>
+      </section>
+    </>
+  )
+}
+
+/* ===== src/pages/ReviewsPage.jsx ===== */
+function ReviewsPage() {
+  usePageMeta(site.seo.reviews.title, site.seo.reviews.description)
+  const ref = useReveal()
+
+  return (
+    <>
+      <PageHero
+        eyebrow={`Reviews · ${site.business.city}`}
+        lead={site.reviews.note}
+        title="What the previous draft said."
+      />
+      <section className="py-section">
+        <div className="mx-auto max-w-container px-gutter">
+          <div className="reveal grid gap-5 md:grid-cols-2" ref={ref}>
+            {site.reviews.items.map((review, i) => (
+              <Tilt className="h-full" key={review.author}>
+                <figure
+                  className="reveal card flex h-full flex-col p-7"
+                  style={{
+                    ...revealDelay(i, 90),
+                    borderLeft: '2px solid color-mix(in srgb, var(--primary-container) 70%, transparent)',
+                  }}
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="c-primary">
+                      <Stars size={14} />
+                    </span>
+                    <Placeholder>Sample</Placeholder>
+                  </div>
+                  <blockquote className="t-body-lg c-on mt-5 flex-1">“{review.quote}”</blockquote>
+                  <figcaption className="hairline-t mt-6 flex items-end justify-between gap-4 pt-5">
+                    <span>
+                      <span className="t-h3 c-on block">{review.author}</span>
+                      <span className="t-caps c-variant mt-1.5 block text-[10px] opacity-65">{review.location}</span>
+                    </span>
+                    <span className="t-mono c-variant text-right text-[10px] tracking-widest opacity-50">
+                      {review.vehicle}
+                    </span>
+                  </figcaption>
+                </figure>
+              </Tilt>
+            ))}
+          </div>
+
+          <div className="card mt-8 flex flex-col items-start gap-4 p-6 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="t-h3 c-on">Google reviews</h2>
+              <p className="t-body c-variant mt-2 max-w-xl">
+                A live rating is not published here. Add the client’s Google review link and the
+                button below starts working.
+              </p>
+            </div>
+            <GoogleReviewButton />
+          </div>
+        </div>
+      </section>
+    </>
+  )
+}
+
+/* ===== src/pages/FaqPage.jsx ===== */
+function FaqPage() {
+  usePageMeta(site.seo.faq.title, site.seo.faq.description)
+  const [open, setOpen] = useState(0)
+
+  return (
+    <>
+      <PageHero
+        eyebrow={`FAQ · ${site.business.city}`}
+        lead="Short answers from the details already on file: the Mississauga address, the three services, and the quote form. Hours and the wider service area stay marked until they are confirmed."
+        title="Questions before a visit."
+      />
+      <section className="py-section">
+        <div className="mx-auto flex max-w-3xl flex-col px-gutter">
+          {site.faq.map((item, i) => {
+            const isOpen = open === i
+            return (
+              <div className="hairline-b" key={item.q}>
+                <button
+                  aria-expanded={isOpen}
+                  className="flex w-full items-center justify-between gap-4 py-5 text-left"
+                  onClick={() => setOpen(isOpen ? -1 : i)}
+                  type="button"
+                >
+                  <span className="t-h3 c-on">{item.q}</span>
+                  <span
+                    className="c-primary shrink-0"
+                    style={{
+                      transform: isOpen ? 'none' : 'rotate(45deg)',
+                      transition: 'transform .25s ease',
+                    }}
+                  >
+                    <Icon name="close" size={16} />
+                  </span>
+                </button>
+                <div
+                  className="grid"
+                  style={{
+                    gridTemplateRows: isOpen ? '1fr' : '0fr',
+                    transition: 'grid-template-rows .3s ease',
+                  }}
+                >
+                  <div className="overflow-hidden">
+                    <p className="t-body c-variant pb-5">{item.a}</p>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </section>
+    </>
+  )
+}
+
+/* ===== src/pages/ContactPage.jsx ===== */
+function ContactPage({ onBook }) {
+  usePageMeta(site.seo.contact.title, site.seo.contact.description)
+  const ref = useReveal()
+
+  return (
+    <>
+      <PageHero
+        eyebrow={`Contact · ${site.business.city}`}
+        lead="Send photos for a quote, or call the number on file. The map uses the street address. Hours stay badged until someone confirms them."
+        title="Get a price, then pick a window."
+      />
+      <section className="py-section">
+        <div className="reveal mx-auto grid max-w-container gap-6 px-gutter lg:grid-cols-5" ref={ref}>
+          <div className="flex flex-col gap-6 lg:col-span-2">
+            <div className="card p-6">
+              <h2 className="t-h3 c-on">Call</h2>
+              <a className="t-h2 c-primary mt-3 inline-flex items-center gap-2" href={site.business.phoneHref}>
+                <Icon name="phone" size={18} />
+                {site.business.phone}
+              </a>
+              <p className="t-body c-variant mt-4">{site.business.address}</p>
+              <button className="btn btn-primary mt-6 px-5 py-3" onClick={() => onBook()} type="button">
+                Book a repair
+                <Icon className="nudge" name="arrowRight" size={14} />
+              </button>
+            </div>
+
+            <div className="card p-6">
+              <div className="flex items-center justify-between gap-3">
+                <h2 className="t-h3 c-on">Hours</h2>
+                {site.hours.placeholder && <Placeholder>Placeholder</Placeholder>}
+              </div>
+              <dl className="mt-4 flex flex-col gap-2">
+                {site.hours.rows.map(([day, hours]) => (
+                  <div className="flex justify-between gap-4" key={day}>
+                    <dt className="t-caps c-variant text-[10px] opacity-70">{day}</dt>
+                    <dd className="t-mono c-on text-[13px]">{hours}</dd>
+                  </div>
+                ))}
+              </dl>
+              <p className="t-body c-variant mt-4 text-[14px]">{site.hours.note}</p>
+            </div>
+
+            <GoogleReviewButton />
+            <MapEmbed />
+          </div>
+          <div className="lg:col-span-3">
+            <QuoteForm heading={false} />
+          </div>
+        </div>
+      </section>
+    </>
+  )
+}
+
+/* ===== src/pages/NotFound.jsx ===== */
+function NotFound() {
+  usePageMeta(`Page not found | ${site.business.name}`, site.seo.home.description)
+  return (
+    <section className="mx-auto flex min-h-[50vh] max-w-container flex-col items-start justify-center px-gutter py-section">
+      <p className="t-caps c-primary">404</p>
+      <h1 className="t-h1 c-on mt-3">That page is not on this site.</h1>
+      <p className="t-body c-variant mt-4 max-w-md">
+        The Premium layout uses seven pages. Head back to the home page and pick one from the menu.
+      </p>
+      <Link className="btn btn-primary mt-8 px-6 py-3" to="/">
+        Back home
+      </Link>
+    </section>
   )
 }
 
 /* ===== src/App.jsx ===== */
+const ROUTES = {
+  '/': Home,
+  '/services': ServicesPage,
+  '/gallery': GalleryPage,
+  '/about': AboutPage,
+  '/reviews': ReviewsPage,
+  '/faq': FaqPage,
+  '/contact': ContactPage,
+}
+
 function App() {
   return (
     <ToastProvider>
-      <Site />
+      <Shell />
     </ToastProvider>
   )
 }
 
-function Site() {
+function Shell() {
+  const path = useRoute()
   const [booking, setBooking] = useState(false)
   const [tracking, setTracking] = useState(false)
   const [preset, setPreset] = useState('')
+  const Page = ROUTES[path] || NotFound
 
   const openBooking = useCallback((serviceId = '') => {
     setPreset(serviceId || '')
     setBooking(true)
   }, [])
 
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get('track') === '1') {
+      setTracking(true)
+      window.history.replaceState({}, '', appHref(path))
+    }
+  }, [path])
+
+  useEffect(() => {
+    const main = document.getElementById('main')
+    if (!main) return
+    main.tabIndex = -1
+    main.focus({ preventScroll: true })
+  }, [path])
+
   return (
     <>
+      <JsonLd />
+      <DemoBanner />
       <Nav onBook={() => openBooking()} onTrack={() => setTracking(true)} />
-
-      <main id="main">
-        <Hero onBook={() => openBooking()} />
-        <Services onBook={openBooking} />
-        <Process onBook={openBooking} />
-        <Portfolio />
-        <Reviews />
-        <CTA onBook={openBooking} />
-        <QuoteForm />
+      <main className="page-enter" id="main" key={path}>
+        <Page onBook={openBooking} />
       </main>
-
       <Footer onTrack={() => setTracking(true)} />
-
       <BookingBar onBook={() => openBooking()} />
-
       <BookingModal onClose={() => setBooking(false)} open={booking} presetService={preset} />
       <TrackModal onClose={() => setTracking(false)} open={tracking} />
     </>
   )
 }
 
-/** The brief asks for a pinned booking widget. On phones it earns its keep as a
- *  bottom bar; on desktop the header CTA is always visible, so it stays out. */
+function JsonLd() {
+  const { business } = site
+  const data = {
+    '@context': 'https://schema.org',
+    '@type': 'AutoRepair',
+    name: business.name,
+    telephone: '+1-416-627-3948',
+    image: publicUrl(business.logo),
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: business.street,
+      addressLocality: business.city,
+      addressRegion: business.region,
+      addressCountry: business.country,
+    },
+    areaServed: business.city,
+  }
+  return <script dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }} type="application/ld+json" />
+}
+
 function BookingBar({ onBook }) {
   const shown = useScrolled(560)
   return (
@@ -2976,11 +4142,11 @@ function BookingBar({ onBook }) {
           boxShadow: '0 -8px 30px -12px #000',
         }}
       >
-        <a className="btn btn-ghost flex-1 py-3.5" href={PHONE_HREF}>
+        <a className="btn btn-ghost flex-1 py-3.5" href={site.business.phoneHref}>
           <Icon name="phone" size={14} />
           Call
         </a>
-        <button className="btn btn-primary flex-[1.4] py-3.5" onClick={onBook} type="button" disabled>
+        <button className="btn btn-primary flex-[1.4] py-3.5" onClick={onBook} type="button">
           Book a repair
         </button>
       </div>

@@ -6,7 +6,7 @@ import { Icon } from './Icon'
  * leaving a broken-image glyph on a dark page, a failed load falls back to a
  * tonal panel that still reads as part of the layout.
  */
-export function SmartImage({ src, alt, className = '', style, label, ...rest }) {
+export function SmartImage({ src, alt, className = '', style, label, priority = false, ...rest }) {
   const [failed, setFailed] = useState(false)
 
   if (failed) {
@@ -29,7 +29,9 @@ export function SmartImage({ src, alt, className = '', style, label, ...rest }) 
     <img
       alt={alt}
       className={className}
-      loading="lazy"
+      decoding="async"
+      fetchPriority={priority ? 'high' : 'auto'}
+      loading={priority ? 'eager' : 'lazy'}
       onError={() => setFailed(true)}
       src={src}
       style={style}

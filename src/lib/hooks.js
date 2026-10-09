@@ -83,3 +83,66 @@ export function useBodyLock(locked) {
     }
   }, [locked])
 }
+
+/** Reads the OS motion preference on the first render so nothing flashes. */
+export function useReducedMotion() {
+  const [reduce, setReduce] = useState(() =>
+    typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  )
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const onChange = () => setReduce(mq.matches)
+    mq.addEventListener('change', onChange)
+    return () => mq.removeEventListener('change', onChange)
+  }, [])
+  return reduce
+}
+
+/**
+ * Slow vertical drift for a hero image. Transform only, so the layout box
+ * never moves. Skipped on small screens and when reduced motion is requested.
+ */
+export function useParallax(ref, speed = 0.08) {
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const desktop = window.matchMedia('(min-width: 768px)')
+    let raf = 0
+
+    const paint = () => {
+      const y = Math.min(window.scrollY, window.innerHeight) * speed
+      el.style.transform = `translate3d(0, ${y.toFixed(2)}px, 0)`
+    }
+
+    const onScroll = () => {
+      if (reduce.matches || !desktop.matches) {
+        el.style.transform = ''
+        return
+      }
+      cancelAnimationFrame(raf)
+      raf = requestAnimationFrame(paint)
+    }
+
+    paint()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    reduce.addEventListener('change', onScroll)
+    desktop.addEventListener('change', onScroll)
+    return () => {
+      cancelAnimationFrame(raf)
+      window.removeEventListener('scroll', onScroll)
+      reduce.removeEventListener('change', onScroll)
+      desktop.removeEventListener('change', onScroll)
+      el.style.transform = ''
+    }
+  }, [speed])
+}
+
+export function usePageMeta(title, description) {
+  useEffect(() => {
+    if (title) document.title = title
+    if (!description) return
+    const el = document.querySelector('meta[name="description"]')
+    if (el) el.setAttribute('content', description)
+  }, [title, description])
+}

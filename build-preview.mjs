@@ -7,28 +7,49 @@
  * app can't drift apart.
  */
 import { readFileSync, writeFileSync } from 'node:fs'
+import { site, theme } from './src/site.config.js'
+
+function brandCss() {
+  const banner = site.demo.show ? '34px' : '0px'
+  const lines = Object.entries(theme).map(([key, value]) => `${key}:${value}`)
+  lines.push(`--banner-h:${banner}`, '--nav-h:68px', '--header-h:calc(var(--banner-h) + var(--nav-h))')
+  return `:root{${lines.join(';')}}`
+}
 
 const ORDER = [
-  'src/lib/data.js',
+  'src/site.config.js',
   'src/lib/api.js',
+  'src/lib/asset.js',
   'src/lib/hooks.js',
+  'src/lib/router.jsx',
   'src/components/Icon.jsx',
   'src/components/SmartImage.jsx',
   'src/components/Toast.jsx',
   'src/components/Modal.jsx',
+  'src/components/Badges.jsx',
   'src/components/BeforeAfter.jsx',
   'src/components/SectionHead.jsx',
+  'src/components/Tilt.jsx',
+  'src/components/Counter.jsx',
+  'src/components/GoogleReviewButton.jsx',
+  'src/components/MapEmbed.jsx',
+  'src/components/PageHero.jsx',
+  'src/components/DemoBanner.jsx',
+  'src/components/HeroScrub.jsx',
+  'src/components/PaintRoom.jsx',
   'src/components/Nav.jsx',
-  'src/components/Hero.jsx',
-  'src/components/Services.jsx',
-  'src/components/Process.jsx',
-  'src/components/Portfolio.jsx',
-  'src/components/Reviews.jsx',
-  'src/components/CTA.jsx',
+  'src/components/Footer.jsx',
   'src/components/QuoteForm.jsx',
   'src/components/BookingModal.jsx',
   'src/components/TrackModal.jsx',
-  'src/components/Footer.jsx',
+  'src/pages/Home.jsx',
+  'src/pages/ServicesPage.jsx',
+  'src/pages/GalleryPage.jsx',
+  'src/pages/AboutPage.jsx',
+  'src/pages/ReviewsPage.jsx',
+  'src/pages/FaqPage.jsx',
+  'src/pages/ContactPage.jsx',
+  'src/pages/NotFound.jsx',
   'src/App.jsx',
 ]
 
@@ -38,6 +59,7 @@ const strip = (code) =>
     .replace(/^import\s+['"][^'"]+['"]\s*;?\s*$/gm, '')
     .replace(/^export\s+default\s+function/gm, 'function')
     .replace(/^export\s+/gm, '')
+    .replace(/import\.meta\.env\.BASE_URL/g, "'/'")
     .trim()
 
 const js = ORDER.map((f) => `/* ===== ${f} ===== */\n${strip(readFileSync(f, 'utf8'))}`).join('\n\n')
@@ -45,7 +67,7 @@ const js = ORDER.map((f) => `/* ===== ${f} ===== */\n${strip(readFileSync(f, 'ut
 // Reuse the token stylesheet, minus the Tailwind directives and layer wrappers
 // (there is no build step here, so plain CSS is what's needed).
 let css = readFileSync('src/index.css', 'utf8')
-  .replace(/@import[^;]+;/g, '')
+  .replace(/@import\s+url\([^)]*\)\s*;/g, '')
   .replace(/@tailwind [a-z]+;/g, '')
 
 /** Removes `@layer name { ... }` wrappers by matching braces, keeping the body. */
@@ -69,7 +91,7 @@ function unwrapLayers(input) {
   return out
 }
 
-css = unwrapLayers(css)
+css = `${brandCss()}\n${unwrapLayers(css)}`
 
 const tailwindConfig = `
 tailwind.config = {
@@ -105,7 +127,9 @@ const html = `<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title>Paint Force — Mobile paint &amp; scratch repair</title>
+<title>Paint Force — Mobile paint and scratch repair in Mississauga</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Paint Force offers mobile scratch removal, paint touch-up, and bumper repair in Mississauga, Ontario. Request a quote or call (416) 627-3948. 6545 Cedar Rapids Crescent.">
 <link href="https://fonts.googleapis.com" rel="preconnect">
 <link crossorigin href="https://fonts.gstatic.com" rel="preconnect">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">

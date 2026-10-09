@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { getRepair } from '../lib/api'
+import { site } from '../site.config'
 import { Icon, Spinner } from './Icon'
 import { Modal } from './Modal'
 
@@ -34,7 +35,8 @@ export function TrackModal({ open, onClose }) {
       <div className="px-6 py-9 sm:px-9">
         <h2 className="t-h1 c-on">Track a repair.</h2>
         <p className="t-body c-variant mt-3">
-          Enter the reference from your confirmation email.
+          Enter the reference from your confirmation. This demo includes sample jobs{' '}
+          {site.sampleJobs.join(', ')}. They are not live customer records.
         </p>
 
         <form className="mt-6 flex flex-col gap-3 sm:flex-row" onSubmit={lookup}>
