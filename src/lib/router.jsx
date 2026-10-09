@@ -7,18 +7,25 @@ import { useEffect, useState } from 'react'
  */
 const listeners = new Set()
 
+export function normalizePath(path) {
+  const bare = String(path || '/').split('?')[0].split('#')[0]
+  if (bare.length > 1 && bare.endsWith('/')) return bare.slice(0, -1)
+  return bare || '/'
+}
+
 export function navigate(to) {
-  if (to !== window.location.pathname) {
-    window.history.pushState({}, '', to)
+  const next = normalizePath(to)
+  if (next !== normalizePath(window.location.pathname)) {
+    window.history.pushState({}, '', next)
     listeners.forEach((l) => l())
   }
   window.scrollTo(0, 0)
 }
 
 export function useRoute() {
-  const [path, setPath] = useState(window.location.pathname)
+  const [path, setPath] = useState(() => normalizePath(window.location.pathname))
   useEffect(() => {
-    const onChange = () => setPath(window.location.pathname)
+    const onChange = () => setPath(normalizePath(window.location.pathname))
     listeners.add(onChange)
     window.addEventListener('popstate', onChange)
     return () => {

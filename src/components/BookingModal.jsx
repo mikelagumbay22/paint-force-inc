@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { createBooking, formatPhone, getAvailability } from '../lib/api'
-import { SERVICES } from '../lib/data'
+import { site } from '../site.config'
 import { Icon, Spinner } from './Icon'
 import { Modal } from './Modal'
 import { useToast } from './Toast'
@@ -108,7 +108,7 @@ export function BookingModal({ open, onClose, presetService }) {
     }
   }
 
-  const service = SERVICES.find((s) => s.id === values.service)
+  const service = site.services.find((s) => s.id === values.service)
   const chosenDay = days.find((d) => d.iso === values.date)
 
   return (
@@ -249,7 +249,7 @@ function StepService({ value, onPick }) {
       <legend className="t-h2 c-on">What needs work?</legend>
       <p className="t-body c-variant mt-2">Not sure? Pick the closest and add a note on the next screen.</p>
       <div className="mt-6 grid gap-3 sm:grid-cols-3">
-        {SERVICES.map((s) => {
+        {site.services.map((s) => {
           const selected = value === s.id
           return (
             <button

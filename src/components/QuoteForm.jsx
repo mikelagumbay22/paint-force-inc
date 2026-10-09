@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { formatPhone, submitQuote } from '../lib/api'
-import { SERVICES } from '../lib/data'
+import { site } from '../site.config'
 import { useReveal } from '../lib/hooks'
 import { Icon, Spinner } from './Icon'
 import { SectionHead } from './SectionHead'
@@ -8,7 +8,7 @@ import { useToast } from './Toast'
 
 const EMPTY = { name: '', email: '', phone: '', vehicle: '', service: '', description: '' }
 
-export function QuoteForm() {
+export function QuoteForm({ heading = true }) {
   const ref = useReveal()
   const toast = useToast()
   const [values, setValues] = useState(EMPTY)
@@ -68,15 +68,19 @@ export function QuoteForm() {
   }
 
   return (
-    <section className="s-lowest py-section" id="quote">
-      <div className="mx-auto max-w-container px-gutter">
-        <SectionHead
-          eyebrow="Estimate"
-          lead="Send photos of the damage and a technician replies with a fixed price, usually within two hours."
-          title="Get a price."
-        />
+    <section className={heading ? 's-lowest py-section' : 'card p-5 sm:p-7'} id="quote">
+      <div className={heading ? 'mx-auto max-w-container px-gutter' : ''}>
+        {heading ? (
+          <SectionHead
+            eyebrow="Estimate"
+            lead="Send photos of the damage and a technician replies with a fixed price, usually within two hours."
+            title="Get a price."
+          />
+        ) : (
+          <h2 className="t-h2 c-on">Quote request</h2>
+        )}
 
-        <div ref={ref} className="reveal mt-12">
+        <div ref={ref} className={heading ? 'reveal mt-12' : 'reveal mt-6'}>
           {done ? (
             <div className="card flex flex-col items-center px-6 py-16 text-center">
               <span
@@ -152,7 +156,7 @@ export function QuoteForm() {
                     value={values.service}
                   >
                     <option value="">Choose the closest match</option>
-                    {SERVICES.map((s) => (
+                    {site.services.map((s) => (
                       <option key={s.id} value={s.id}>
                         {s.name}
                       </option>
