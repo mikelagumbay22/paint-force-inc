@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { publicUrl } from '../lib/asset'
 import { useReducedMotion } from '../lib/hooks'
 
-const VIDEO_SRC = publicUrl('/hero-video/painter-turn-720p-intra.mp4')
+const VIDEO_SRC = publicUrl('/hero-video/car-turn-720p-intra.mp4')
 const POSTER_SRC = publicUrl('/hero-video/poster.jpg')
 const FRAME_COUNT = 30
 const DURATION_FALLBACK = 3

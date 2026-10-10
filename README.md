@@ -25,7 +25,7 @@ Kept from the existing project: the Paint Force name, phone `(416) 627-3948`, an
 
 ## Motion
 
-Page transitions, scroll reveals, desktop-only parallax, card tilt, a before/after slider, counters, and button and nav feedback. The home hero scrubs `public/hero-video/` from the cursor (scroll, then a slow ping-pong, on touch) and does not autoplay. Below it, a pinned scene in `public/scroll-scene/` wipes primer to paint. `prefers-reduced-motion: reduce` shows the hero poster and the finished room only. Motion uses opacity and transform so the layout box does not move.
+Page transitions, scroll reveals, desktop-only parallax, card tilt, a before/after slider, counters, and button and nav feedback. The home hero scrubs a car on a turntable in `public/hero-video/` from the cursor (scroll, then a slow ping-pong, on touch) and does not autoplay. Below it, a pinned scene in `public/scroll-scene/` wipes a damaged panel to a repaired one. `prefers-reduced-motion: reduce` shows the hero poster and the repaired panel only. Motion uses opacity and transform so the layout box does not move.
 
 ## Backend
 

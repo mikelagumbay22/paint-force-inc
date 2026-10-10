@@ -365,7 +365,7 @@ body {
   }
   .chip-wrap { white-space: normal; text-align: left; line-height: 1.35; }
 
-  /* Primer shows until scroll assigns the roller wipe. */
+  /* Damaged panel shows until scroll assigns the spray wipe. */
   .paint-wipe { clip-path: inset(0 100% 0 0); }
 
   @media (prefers-reduced-motion: reduce) {
@@ -1851,7 +1851,7 @@ function DemoBanner() {
 }
 
 /* ===== src/components/HeroScrub.jsx ===== */
-const VIDEO_SRC = publicUrl('/hero-video/painter-turn-720p-intra.mp4')
+const VIDEO_SRC = publicUrl('/hero-video/car-turn-720p-intra.mp4')
 const POSTER_SRC = publicUrl('/hero-video/poster.jpg')
 const FRAME_COUNT = 30
 const DURATION_FALLBACK = 3
@@ -2188,16 +2188,16 @@ function SceneImage({ base, fallback }) {
 }
 
 /**
- * Pinned 200vh scene. Primer stays put, the painted wall wipes on like a
- * roller, the sofa lags at 0.6×, and the foreground props drift outward.
- * Reduced motion renders the finished room at its natural height.
+ * Pinned 200vh scene. The damaged panel stays put, the repaired panel wipes
+ * on left to right like a spray pass, the gun moves at 0.8×, and the cart
+ * and tape drift outward. Reduced motion shows the repaired panel only.
  */
 function PaintRoom() {
   const reduce = useReducedMotion()
   const sectionRef = useRef(null)
   const pinRef = useRef(null)
   const wipeRef = useRef(null)
-  const sofaRef = useRef(null)
+  const gunRef = useRef(null)
   const leftRef = useRef(null)
   const rightRef = useRef(null)
   const lineRef = useRef(null)
@@ -2220,8 +2220,8 @@ function PaintRoom() {
       if (wipeRef.current) {
         wipeRef.current.style.clipPath = `inset(0 ${(1 - progress) * 100}% 0 0)`
       }
-      if (sofaRef.current) {
-        sofaRef.current.style.transform = `translate3d(0, ${(progress * unit * 0.6).toFixed(2)}px, 0)`
+      if (gunRef.current) {
+        gunRef.current.style.transform = `translate3d(0, ${(progress * unit * 0.8).toFixed(2)}px, 0)`
       }
       if (leftRef.current) {
         leftRef.current.style.transform = `translate3d(${(-progress * unit * 1.25).toFixed(2)}px, ${(progress * unit * 0.2).toFixed(2)}px, 0)`
@@ -2249,7 +2249,7 @@ function PaintRoom() {
 
   return (
     <section
-      aria-label="Illustrative paint study"
+      aria-label="Illustrative panel repair"
       className="paint-track relative h-[200vh]"
       ref={sectionRef}
     >
@@ -2258,12 +2258,12 @@ function PaintRoom() {
         ref={pinRef}
         style={{ top: 'var(--header-h)', height: 'calc(100svh - var(--header-h))' }}
       >
-        <SceneImage base="bg-wall-primer" fallback="jpg" />
+        <SceneImage base="bg-panel-damaged" fallback="jpg" />
         <div className="paint-wipe pointer-events-none absolute inset-0" ref={wipeRef}>
-          <SceneImage base="bg-wall-painted" fallback="jpg" />
+          <SceneImage base="bg-panel-repaired" fallback="jpg" />
         </div>
-        <div className="paint-layer pointer-events-none absolute inset-0" ref={sofaRef}>
-          <SceneImage base="mid-sofa" fallback="png" />
+        <div className="paint-layer pointer-events-none absolute inset-0" ref={gunRef}>
+          <SceneImage base="mid-spraygun" fallback="png" />
         </div>
         <div className="paint-layer pointer-events-none absolute inset-0" ref={leftRef}>
           <SceneImage base="fg-left" fallback="png" />
@@ -2276,9 +2276,9 @@ function PaintRoom() {
           <div className="max-w-xl">
             <p className="t-caps c-primary">Motion study</p>
             <h2 className="t-h1 c-on mt-3">
-              <span className="block">From bare walls</span>
+              <span className="block">From dents and scratches</span>
               <span className="c-primary mt-1 block" ref={lineRef} style={{ opacity: reduce ? 1 : 0.35 }}>
-                to a finished room.
+                to a factory finish.
               </span>
             </h2>
           </div>
@@ -3511,7 +3511,7 @@ function Home({ onBook }) {
             }}
           />
           <p className="chip badge-illustrative chip-wrap pointer-events-none absolute right-3 top-3 z-20 max-w-[15rem] sm:right-6 sm:top-5 sm:max-w-[20rem]">
-            Illustrative video, not footage of Paint Force&apos;s work
+            Illustrative video, not a photo of Paint Force&apos;s work
           </p>
         </div>
 
